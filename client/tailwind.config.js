@@ -1,16 +1,12 @@
-const defaultTheme = require("tailwindcss/defaultTheme");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-  ],
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
       fontFamily: {
         content: ['Ubuntu'],
-        title: ['Raleway']
-
+        title: ['Raleway'],
       },
       colors: {
         hot: {
@@ -27,10 +23,18 @@ module.exports = {
           400: '#001219',
         },
         neutral: '#E9D8A6'
-        
-
-      }
+      },
+      container: {
+        center: true,
+        padding: {
+          DEFAULT: '1rem'
+        },
+        screens: {
+          xl: '1240px'
+        }
+      },
+      
     },
+    plugins: [],
   },
-  plugins: [],
-}
+};
