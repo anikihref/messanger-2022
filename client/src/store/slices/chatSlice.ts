@@ -1,7 +1,15 @@
 import { IChat } from './../../types/chat';
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState: IChat[] | null = null;
+interface InitialStateProps {
+    chats: IChat[] | null,
+    selectedChat: IChat | null
+}
+
+const initialState: InitialStateProps = {
+    chats: null,
+    selectedChat: null
+};
 
 export const chatSlice = createSlice({
     initialState,
