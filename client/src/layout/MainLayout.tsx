@@ -6,7 +6,7 @@ const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   return (
-    <div className='h-full  bg-blue-300'>
+    <div className='h-full  bg-neutral'>
       <div className='container'>
         <Outlet />
 
@@ -19,11 +19,9 @@ const MainLayout = () => {
           }}    
         >
           {/* line */}
-          <div className="container absolute opacity-30 bottom-[20%] h-[20px] left-5 right-5 bg-blue-200 rounded-xl"></div>
+          <div className="container absolute opacity-50 bottom-[20%] h-[20px] left-5 right-5 bg-cold-300 rounded-xl"></div>
           <Navbar isOpened={sidebarOpen}></Navbar>
-
         </div>
-
       </div>
     </div>
   );
