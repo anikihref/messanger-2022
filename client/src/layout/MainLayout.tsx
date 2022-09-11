@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import useTimeout from '../hooks/useTimeout';
 
 const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const {clear, reset} = useTimeout(() => setSidebarOpen(false) , 1000);
+
+  useEffect(() => {
+    clear()
+  })
 
   return (
     <div className='h-full  bg-neutral'>
@@ -13,9 +19,12 @@ const MainLayout = () => {
         {/* sidebar trigger */}
         <div
           className='fixed bottom-0 h-[10%] left-0 right-0'
-          onMouseOver={() => setSidebarOpen(true)}
+          onMouseOver={() => {
+            clear()
+            setSidebarOpen(true)
+          }}
           onMouseOut={() => {
-            setSidebarOpen(false);
+            reset()
           }}    
         >
           {/* line */}
