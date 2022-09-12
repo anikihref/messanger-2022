@@ -6,5 +6,5 @@ export interface IChat {
     lastMessage: MongooseIDType; // Message
     title: string;
     createdAt: Date;
-    members: MongooseIDType[] | null; // User
+    members: MongooseIDType[]; // User
 }
