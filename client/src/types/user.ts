@@ -2,7 +2,7 @@ import { MongooseIDType, ImageType } from './index';
 
 export interface IUser {
     id: MongooseIDType; // User
-    avatar: ImageType | null;
+    avatar: ImageType;
     username: string;
     email: string;
     bio: string;
@@ -10,5 +10,5 @@ export interface IUser {
     activated: boolean;
     phoneNumber: string;
     status: 'online' | 'offline';
-    friends: MongooseIDType[] | null; // User
+    friends: MongooseIDType[]; // User
 };
