@@ -1,7 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { IUser } from './../../types/user';
 
-const initialState: IUser | null = null;
+interface InitialStateProps {
+    user: IUser | null;
+    selectedUser: IUser | null;
+}
+
+const initialState: InitialStateProps = {
+    user: null,
+    selectedUser: null
+};
 
 export const userSlice = createSlice({
     initialState,
