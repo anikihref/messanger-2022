@@ -4,8 +4,8 @@ const messageSchema = new mongoose.Schema({
     content: {type: String, required: true},
     createdAt: {type: Date, default: new Date()},
     updatedAt: {type: Date, default: new Date()},
-    chat: {type: mongoose.Types.ObjectId, required: true, ref: 'Chat'},
-    creator: {type: mongoose.Types.ObjectId, required: true, ref: 'User'},
+    chat: {type: mongoose.SchemaTypes.ObjectId, required: true, ref: 'Chat'},
+    creator: {type: mongoose.SchemaTypes.ObjectId, required: true, ref: 'User'},
     type: {type: String, required: true}
 })
 

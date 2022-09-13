@@ -4,7 +4,7 @@ const UserSchema = new mongoose.Schema({
     username: {type: String, required: true, unique: true},
     email: {type: String, required: true, unique: true},
     avatar: {type: String, default: 'empty_avatar.png'},
-    friends: {type: mongoose.Types.ObjectId},
+    friends: {type: mongoose.SchemaTypes.ObjectId, ref: 'User'},
     activated: { type: Boolean, required: true },
     password: { type: String, required: true },
     bio: { type: String },
