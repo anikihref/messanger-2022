@@ -55,22 +55,7 @@ class ChatController {
     }
   }
 
-  async getMessages(req, res) {
-    try {
-      const messages = await chatService.getMessages(
-        req.params.id,
-        req.query.limit
-      );
-
-      res.json(messages);
-    } catch (error) {
-      res
-        .json({
-          message: error.message,
-        })
-        .status(400);
-    }
-  }
+  
 
   async changeTitle(req, res) {
     try {
@@ -129,18 +114,6 @@ class ChatController {
           message: error.message,
         })
         .status(400);
-    }
-  }
-
-  async clearHistory(req, res) {
-    try {
-      await chatService.clearHistory(req.params.chatId)
-      
-      res.send('Chat history has been cleared successfully')
-    } catch (error) {
-      res.json({
-        message: error.message
-      })
     }
   }
 }

@@ -14,4 +14,4 @@ messageSchema.pre('save', function(next) {
     next();
 })
 
-export default mongoose.model('Message', messageSchema)
+export default mongoose.model('Message', messageSchema);
