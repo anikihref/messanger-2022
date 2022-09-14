@@ -75,7 +75,7 @@ class ChatController {
 
   async addMember(req, res) {
     try {
-      const { chatId, userId } = req.params;
+      const { chatId, userId } = req.body.data;
 
       const chat = await chatService.addMember(chatId, userId);
 
@@ -97,7 +97,7 @@ class ChatController {
 
   async removeMember(req, res) {
     try {
-      const { chatId, userId } = req.params;
+      const { chatId, userId } = req.body.data;
 
       const chat = await chatService.removeMember(chatId, userId);
 

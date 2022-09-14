@@ -8,5 +8,5 @@ chatRouter.get('/:id', chatController.getChat);
 chatRouter.get('/all/:userId', chatController.getAllChats)
 chatRouter.delete('/:id', chatController.delete);
 chatRouter.patch('/title/:chatId', chatController.changeTitle);
-chatRouter.patch('/member/remove/:userId/:chatId', chatController.removeMember);
-chatRouter.patch('/member/add/:userId/:chatId', chatController.addMember);
+chatRouter.patch('/member/remove', chatController.removeMember);
+chatRouter.patch('/member/add', chatController.addMember);
