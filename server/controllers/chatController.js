@@ -1,10 +1,9 @@
 import chatService from '../services/chatService.js';
-import ChatDto from '../dtos/chatDto.js';
 
 class ChatController {
   async create(req, res) {
     try {
-      const createdPost = new ChatDto(await chatService.create(req.body));
+      const createdPost = await chatService.create(req.body);
       res.json(createdPost);
     } catch (error) {
       res
@@ -18,9 +17,7 @@ class ChatController {
 
   async getAllChats(req, res) {
     try {
-      const chats = (
-        await chatService.getAllChats(req.params.userId, req.query.limit)
-      ).map((chat) => new ChatDto(chat));
+      const chats = await chatService.getAllChats(req.params.userId, req.query.limit)
 
       res.json(chats);
     } catch (error) {

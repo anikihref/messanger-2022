@@ -1,21 +1,23 @@
-import mongoose, { Mongoose } from "mongoose";
+import mongoose from "mongoose";
+import ChatDto from "../dtos/chatDto.js";
 import ChatModel from "../models/ChatModel.js";
-import MessageModel from "../models/messageModel.js";
 
 
 class ChatService {
     async create(chat) {
             const {members, lastMessage, title, createdAt} = chat;
 
-            const createdChat = await ChatModel.create({
+            const doc = await ChatModel.create({
                 members, lastMessage, title, createdAt
             });
     
-            return createdChat; 
+            return new ChatDto(doc); 
     }
 
     async getAllChats(userId, limit = 20) {
-        await ChatModel.find({members: {$in: mongoose.Types.ObjectId(userId)}}).limit(limit)
+        const docs = await ChatModel.find({members: {$in: mongoose.Types.ObjectId(userId)}}).limit(limit);
+
+        return docs.map(chat => new ChatDto(chat));
     }
 
     async delete(chatId) {
@@ -23,11 +25,9 @@ class ChatService {
     }
     
     async getChat(chatId) {
-        return await ChatModel.findById(chatId).populate('lastMessage');
-    }
+        const doc = await ChatModel.findById(chatId).populate('lastMessage');
 
-    async getMessages(chatId, limit = 50) {
-        return await MessageModel.find({chat: mongoose.Types.ObjectId(chatId)}).limit(limit);
+        return new ChatDto(doc)
     }
 
     async changeTitle(title, chatId) {
@@ -35,7 +35,7 @@ class ChatService {
         doc.title = title;
         await doc.save()
         
-        return doc;
+        return new ChatDto(doc);
     }
 
     async addMember(chatId, userId) {
@@ -47,7 +47,7 @@ class ChatService {
         }
 
         await doc.save();
-        return doc;
+        return new ChatDto(doc);
     }
     
     async removeMember(chatId, userId) {
@@ -61,11 +61,7 @@ class ChatService {
         doc.members = newMemberList
         await doc.save();
 
-        return doc;
-    }
-
-    async clearHistory(chatId) {
-        await MessageModel.deleteMany({ chat: mongoose.Types.ObjectId(chatId) })
+        return new ChatDto(doc);
     }
 }
 
