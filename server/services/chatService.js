@@ -1,38 +1,63 @@
-class ChatService {
-    async create(user) {
+import mongoose from "mongoose";
+import ChatDto from "../dtos/chatDto.js";
+import ChatModel from "../models/ChatModel.js";
 
+
+class ChatService {
+    async create(chat) {
+            const {members, lastMessage, title, createdAt} = chat;
+
+            const doc = await ChatModel.create({
+                members, lastMessage, title, createdAt
+            });
+    
+            return new ChatDto(doc); 
+    }
+
+    async getAllChats(userId, limit = 20) {
+        const docs = await ChatModel.find({members: {$in: mongoose.Types.ObjectId(userId)}}).limit(limit);
+
+        return docs.map(chat => new ChatDto(chat));
     }
 
     async delete(chatId) {
-        
-    }
-
-    async getMembers(chatId) {
-        
-    }
-
-    async getMessages(chatId) {
-
-    }
-
-    async getChat(chatId) {
-
-    }
-
-    async changeTitle(title) {
-
-    }
-
-    async addMember(userId) {
-
+        await ChatModel.findByIdAndDelete(chatId)
     }
     
-    async deleteMember(userId) {
+    async getChat(chatId) {
+        const doc = await ChatModel.findById(chatId).populate('lastMessage');
 
+        return new ChatDto(doc)
     }
 
-    async clearHistory(req, res) {
+    async changeTitle(title, chatId) {
+        const doc = await ChatModel.findById(chatId);
+        doc.title = title;
+        await doc.save()
+        
+        return new ChatDto(doc);
+    }
 
+    async addMember(chatId, userId) {
+        const doc = await ChatModel.findById(chatId)
+        doc.members.push(userId)
+
+        if (doc.members.includes(mongoose.Types.ObjectId(userId))) {
+            throw new Error('User is already a chat member')
+        }
+
+        await doc.save();
+        return new ChatDto(doc);
+    }
+    
+    async removeMember(chatId, userId) {
+        const doc = await ChatModel.findById(chatId)
+        const newMemberList = doc.members.filter(member => member.toString() !== userId);
+
+        doc.members = newMemberList
+        await doc.save();
+
+        return new ChatDto(doc);
     }
 }
 
