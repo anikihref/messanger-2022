@@ -42,8 +42,8 @@ class ChatService {
         const doc = await ChatModel.findById(chatId)
         doc.members.push(userId)
 
-        if (doc.members.length > 15) {
-            throw new Error('Could not add member. The maximum number of members is 15.');
+        if (doc.members.includes(mongoose.Types.ObjectId(userId))) {
+            throw new Error('User is already a chat member')
         }
 
         await doc.save();
@@ -53,10 +53,6 @@ class ChatService {
     async removeMember(chatId, userId) {
         const doc = await ChatModel.findById(chatId)
         const newMemberList = doc.members.filter(member => member.toString() !== userId);
-
-        if (newMemberList.length < 2) {
-            throw new Error('Could not delete member. The minimum number of members is 2.');
-        }
 
         doc.members = newMemberList
         await doc.save();

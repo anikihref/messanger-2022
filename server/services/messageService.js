@@ -14,7 +14,7 @@ class MessageService {
 
     async edit(message, messageId) {
         const doc = await MessageModel.findById(messageId);
-        // todo: validation. if doc.content === text message cannot be image and if doc.content === 'image' throw error;
+
         doc.content = message;
         await doc.save();
         return new MessageDto(doc);
