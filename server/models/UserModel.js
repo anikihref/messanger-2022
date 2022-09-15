@@ -4,13 +4,13 @@ const UserSchema = new mongoose.Schema({
     username: {type: String, required: true, unique: true},
     email: {type: String, required: true, unique: true},
     avatar: {type: String, default: 'empty_avatar.png'},
-    friends: {type: mongoose.SchemaTypes.ObjectId, ref: 'User'},
+    friends: {type: [mongoose.SchemaTypes.ObjectId], ref: 'User'},
     activated: { type: Boolean, required: true },
     password: { type: String, required: true },
-    bio: { type: String },
-    name: { type: String },
+    bio: { type: String, default: '' },
+    name: { type: String, default: '' },
     status: {type: String, required: true},
-    phoneNumber: {type: String}
+    phoneNumber: {type: String, default: ''}
 })
 
 export default mongoose.model('User', UserSchema);
