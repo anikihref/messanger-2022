@@ -1,5 +1,8 @@
+import { baseURL, URLs } from './index';
 import axios from "axios";
 
-export const chatApiBase = axios.create({
-    baseURL: 'http://localhost:5000/user'
+export const userApi = axios.create({
+    baseURL: baseURL + URLs.User
 });
+
+
