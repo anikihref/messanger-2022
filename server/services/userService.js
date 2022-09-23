@@ -50,8 +50,10 @@ class UserController {
         await doc.save();
         return doc;
     }
-
-    async getUser(userId) {
+    async getUser(key, value) {
+        return await UserModel.find({ [key]: value });
+    }
+    async getUserById(userId) {
         return await UserModel.findById(userId);
     }
 }
