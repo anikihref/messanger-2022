@@ -69,7 +69,20 @@ class UserController {
 
     async getUser(req, res) {
         try {
-            const user = await userService.getUser(req.params.id)
+            const {searchType: key, value} = req.query;
+
+            const data = await userService.getUser(key, value);
+            res.json(data);
+        } catch (error) {
+            res.json({
+                message: error.message
+            })
+        }
+    }
+
+    async getUserById(req, res) {
+        try {
+            const user = await userService.getUserById(req.params.id)
 
             res.json(user)
         } catch (error) {
