@@ -1,5 +1,6 @@
 import axios from "axios";
+import { URLs, baseURL } from './index';
 
 export const chatApi = axios.create({
-    baseURL: 'http://localhost:5000/chat'
+    baseURL: baseURL + URLs.Chat
 });
