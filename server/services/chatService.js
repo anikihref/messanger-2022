@@ -25,7 +25,7 @@ class ChatService {
     }
     
     async getChat(chatId) {
-        const doc = await ChatModel.findById(chatId).populate('lastMessage');
+        const doc = await ChatModel.findById(chatId).populate('lastMessage').select('content');
 
         return new ChatDto(doc)
     }
