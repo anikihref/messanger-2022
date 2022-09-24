@@ -1,5 +1,5 @@
 import UserModel from "../models/UserModel.js"
-import UserDto from '../dtos/userDto.ks'
+import UserDto from '../dtos/userDto.js'
 
 class UserController {
     async create(user) {
