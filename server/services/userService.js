@@ -1,11 +1,11 @@
 import UserModel from "../models/UserModel.js"
-
+import UserDto from '../dtos/userDto.ks'
 
 class UserController {
     async create(user) {
         const doc = await UserModel.create(user);
 
-        return doc;
+        return new UserDto(doc);
     }
 
     async delete(userId) {
@@ -25,7 +25,7 @@ class UserController {
 
         doc.friends.push(friendId)
         await doc.save();
-        return doc;
+        return new UserDto(doc);
     }
 
     async removeFriend(userId, exFriendId) {
@@ -40,7 +40,7 @@ class UserController {
         doc.friends = newFriendList;
         await doc.save();
 
-        return doc;
+        return new UserDto(doc);
     }
 
     async edit(userId, key, value) {
@@ -48,13 +48,17 @@ class UserController {
 
         doc[key] = value;
         await doc.save();
-        return doc;
+        return new UserDto(doc);
     }
+
     async getUser(key, value) {
-        return await UserModel.find({ [key]: value });
+        const doc = await UserModel.findOne({ [key]: value })
+        return new UserDto(doc);
     }
+
     async getUserById(userId) {
-        return await UserModel.findById(userId);
+        const doc = await UserModel.findById(userId)
+        return new UserDto(doc);
     }
 }
 
