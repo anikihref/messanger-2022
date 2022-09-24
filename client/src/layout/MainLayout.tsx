@@ -13,7 +13,7 @@ const MainLayout = () => {
 
   return (
     <div className='h-full  bg-neutral'>
-      <div className='container'>
+      <div className='container h-full'>
         <Outlet />
 
         {/* sidebar trigger */}
