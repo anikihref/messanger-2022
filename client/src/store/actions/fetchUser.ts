@@ -6,7 +6,7 @@ import { AppDispatch } from './../../types/store';
 
 export const fetchUser = (email: string) => async (dispatch: AppDispatch) => {
     try {
-        const {data: user} = await userApi.get<IUser>(`?searchType=email&value=${email}`);
+        const {data: user} = await userApi.get<IUser>(`?key=email&value=${email}`);
         if (!user) return;
         dispatch(userSlice.actions.auth(user));
     } catch (error: any) {

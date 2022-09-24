@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { useTypedDispatch } from './hooks/redux';
 import AuthLayout from './layout/AuthLayout';
 import FullpageLayout from './layout/FullpageLayout';
 import MainLayout from './layout/MainLayout';
 import { ChatPage, LoginPage, MainPage, ProfilePage, RegistrationPage, SearchPage, SettingsPage, UserPage } from './pages';
+import { fetchUser } from './store/actions/fetchUser';
 
 
 function App() {
+  const dispatch = useTypedDispatch();
+
+  useEffect(() => {
+    dispatch(fetchUser('grandwar39@gmail.com'))
+  }, [])
+
   return (
     
     <Routes>
