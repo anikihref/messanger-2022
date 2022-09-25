@@ -1,6 +1,5 @@
 import { MongooseIDType } from './../../types/index';
 import { messageApi } from './../../api/messageApi';
-import { IChatMessage } from './../../types/chatMessage';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
 
@@ -10,7 +9,7 @@ export const fetchMessages = createAsyncThunk(
         chatId: MongooseIDType,
         limit: number
     }) => {
-        const response = await messageApi.get<IChatMessage[]>(`/all/${payload.chatId}?limit=${payload.limit}`);
+        const response = await messageApi.getAllChatMessages(payload.chatId, payload.limit);
         return response.data;
     }
 );
