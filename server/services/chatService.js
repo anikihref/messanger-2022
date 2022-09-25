@@ -40,12 +40,12 @@ class ChatService {
 
     async addMember(chatId, userId) {
         const doc = await ChatModel.findById(chatId)
-        doc.members.push(userId)
 
-        if (doc.members.includes(mongoose.Types.ObjectId(userId))) {
+        if (doc.members.includes(userId)) {
             throw new Error('User is already a chat member')
         }
-
+        
+        doc.members.push(userId)
         await doc.save();
         return new ChatDto(doc);
     }
