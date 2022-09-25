@@ -4,6 +4,6 @@ export default class ChatDto {
         this.title = chat.title;
         this.members = chat.members;
         this.createdAt = chat.createdAt;
-        this.lastMessage = chat.lastMessage;
+        this.lastMessage = chat.lastMessage.content;
     }
 };

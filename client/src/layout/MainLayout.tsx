@@ -1,37 +1,50 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import useTimeout from '../hooks/useTimeout';
+import Button from '../components/Button';
+import Chat from '../components/Chat';
+import NavbarTrigger from '../components/NavbarTrigger';
+import { useTypedDispatch, useTypedSelector } from '../hooks/redux';
+import { fetchChats } from '../store/actions/fetchChats';
 
 const MainLayout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
-  const {clear, reset} = useTimeout(() => setSidebarOpen(false) , 1000);
+  const dispatch = useTypedDispatch();
+  const {chats} = useTypedSelector(state => state.chat)
+  const {user} = useTypedSelector(state => state.user)
 
   useEffect(() => {
-    clear()
-  })
+    if (user) {
+      dispatch(fetchChats(user.id))
+    }
+  }, [user])
 
   return (
     <div className='h-full  bg-neutral'>
-      <div className='container h-full'>
-        <Outlet />
+      <div className='container max-h-[90%] flex'>
 
-        {/* sidebar trigger */}
-        <div
-          className='fixed bottom-0 h-[10%] left-0 right-0'
-          onMouseOver={() => {
-            clear()
-            setSidebarOpen(true)
-          }}
-          onMouseOut={() => {
-            reset()
-          }}    
-        >
-          {/* line */}
-          <div className="container absolute opacity-50 bottom-[20%] h-[20px] left-5 right-5 bg-cold-300 rounded-xl"></div>
-          <Navbar isOpened={sidebarOpen}></Navbar>
+        {/* Chatlist */}
+        <div className='w-[40%] p-5 flex flex-col gap-y-2 overflow-y-auto'>
+          {chats.toString() ? chats.map((chat) => (
+              <Button
+              key={chat.id}>
+                <Chat
+                  
+                  chat={chat}
+                />
+              </Button>
+            )) : <div>
+              no chats yet
+          </div>}
         </div>
-      </div>
+
+
+          {/* Custom content */}
+          <div className='grow overflow-y-auto p-2'>
+            <Outlet />  
+          </div>
+        </div>
+
+        {/* navbar trigger */}
+        <NavbarTrigger />
     </div>
   );
 };

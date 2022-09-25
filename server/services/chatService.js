@@ -9,13 +9,15 @@ class ChatService {
 
             const doc = await ChatModel.create({
                 members, lastMessage, title, createdAt
-            });
+            }).populate('lastMessage');
     
             return new ChatDto(doc); 
     }
 
     async getAllChats(userId, limit = 20) {
-        const docs = await ChatModel.find({members: {$in: mongoose.Types.ObjectId(userId)}}).limit(limit);
+        const docs = await ChatModel.find({members: {$in: mongoose.Types.ObjectId(userId)}})
+            .limit(limit)
+            .populate('lastMessage')
 
         return docs.map(chat => new ChatDto(chat));
     }
@@ -31,7 +33,7 @@ class ChatService {
     }
 
     async changeTitle(title, chatId) {
-        const doc = await ChatModel.findById(chatId);
+        const doc = await ChatModel.findById(chatId).populate('lastMessage');
         doc.title = title;
         await doc.save()
         
@@ -51,7 +53,7 @@ class ChatService {
     }
     
     async removeMember(chatId, userId) {
-        const doc = await ChatModel.findById(chatId)
+        const doc = await ChatModel.findById(chatId).populate('lastMessage')
         const newMemberList = doc.members.filter(member => member.toString() !== userId);
 
         doc.members = newMemberList
