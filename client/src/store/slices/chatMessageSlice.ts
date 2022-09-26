@@ -35,6 +35,14 @@ export const chatMessageSlice = createSlice({
         
         select(state, action: PayloadAction<IChatMessage>) {
             state.selectedMessage = action.payload;
+        },
+
+        addMessage(state, action: PayloadAction<IChatMessage>) {
+            state.messages.push(action.payload)
+        },
+
+        reset(state) {
+            state.messages = [];
         }
     },
     extraReducers: {
