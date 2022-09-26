@@ -1,3 +1,4 @@
+import chatService from "../services/chatService.js";
 import messageService from "../services/messageService.js";
 
 class MessageController {
@@ -5,7 +6,8 @@ class MessageController {
         try {
             const message = req.body.data;
             const createdMessage = await messageService.create(message);
-
+            await chatService.setLastMessage(message.chat, createdMessage._id)
+          
             res.json(createdMessage)
         } catch (error) {
             res.json({

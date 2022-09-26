@@ -1,4 +1,5 @@
 import chatService from '../services/chatService.js';
+import messageService from '../services/messageService.js';
 
 class ChatController {
   async create(req, res) {
@@ -31,6 +32,7 @@ class ChatController {
 
   async delete(req, res) {
     try {
+      await messageService.deleteAllChatMessages(chatId);
       await chatService.delete(req.params.id);
       res.send('deleted');
     } catch (error) {

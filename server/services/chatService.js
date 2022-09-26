@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import ChatDto from "../dtos/chatDto.js";
 import ChatModel from "../models/ChatModel.js";
+import messageService from './messageService.js'
 
 
 class ChatService {
@@ -60,6 +61,14 @@ class ChatService {
         await doc.save();
 
         return new ChatDto(doc);
+    }
+
+    async setLastMessage(chatId, messageId) {
+        const doc = await ChatModel.findById(chatId);
+
+        doc.lastMessage = messageId;
+
+        await doc.save()
     }
 }
 
