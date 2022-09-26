@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const ChatSchema = new mongoose.Schema({
   title: { type: String, required: true, maxLength: [35, 'Title is too long'] },
-  lastMessage: { type: String, default: '' },
+  lastMessage: { type: mongoose.SchemaTypes.ObjectId, ref: 'Message' },
   createdAt: { type: Date, default: new Date() },
   members: {
     type: [mongoose.SchemaTypes.ObjectId],
