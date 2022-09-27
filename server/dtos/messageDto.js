@@ -3,7 +3,7 @@ export default class MessageDto {
         this.id = message._id;
         this.content = message.content;
         this.type = message.type;
-        this.creator = message.friends;
+        this.creator = message.creator;
         this.createdAt = message.createdAt;
         this.updatedAt = message.updatedAt;
         this.chat = message.chat;
