@@ -27,7 +27,10 @@ class MessageService {
     }
 
     async getAllChatMessages(chatId, limit = 50) {
-        const docs = await MessageModel.find({chat: mongoose.Types.ObjectId(chatId)}).limit(limit).populate('creator');
+        const docs = await MessageModel.find({chat: mongoose.Types.ObjectId(chatId)})
+            .sort({createdAt: -1})
+            .limit(limit)
+            .populate('creator');
 
         return docs.map(doc => new MessageDto(doc));
     }

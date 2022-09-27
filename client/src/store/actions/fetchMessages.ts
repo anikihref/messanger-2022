@@ -10,6 +10,7 @@ export const fetchMessages = createAsyncThunk(
         limit: number
     }) => {
         const response = await messageApi.getAllChatMessages(payload.chatId, payload.limit);
+        response.data.reverse()
         return response.data;
     }
 );
