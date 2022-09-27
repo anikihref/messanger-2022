@@ -24,7 +24,7 @@ export const messageApi = {
         await baseMessageUrl.delete(`/${messageId}`);
     },
 
-    async createMessage(message: Omit<IChatMessage, 'createdAt' | 'updatedAt' | 'id'>): Promise<AxiosResponse<IChatMessage, any>> {
+    async createMessage(message: Omit<IChatMessage, 'createdAt' | 'updatedAt' | 'id' | 'creator'> & {creator: string}): Promise<AxiosResponse<IChatMessage, any>> {
         return await baseMessageUrl.post<IChatMessage>('/', {
             data: message
         })
