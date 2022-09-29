@@ -12,8 +12,8 @@ export const messageApi = {
         return await baseMessageUrl.get<IChatMessage>(`/${messageId}`)
     },
 
-    async getAllChatMessages(chatId: MongooseIDType, limit?: number): Promise<AxiosResponse<IChatMessage[], any>> {
-        return await baseMessageUrl.get<IChatMessage[]>(`/all/${chatId}?limit=${limit}`)
+    async getAllChatMessages(chatId: MongooseIDType, limit?: number, from?: number): Promise<AxiosResponse<IChatMessage[], any>> {
+        return await baseMessageUrl.get<IChatMessage[]>(`/all/${chatId}?limit=${limit}&from=${from}`)
     },
 
     async deleteAllMessages(chatId: MongooseIDType): Promise<void> {

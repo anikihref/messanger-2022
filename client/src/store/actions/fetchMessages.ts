@@ -7,10 +7,10 @@ export const fetchMessages = createAsyncThunk(
     'message/fetchAll', 
     async (payload: {
         chatId: MongooseIDType,
-        limit: number
+        limit: number,
+        from?: number
     }) => {
-        const response = await messageApi.getAllChatMessages(payload.chatId, payload.limit);
-        response.data.reverse()
+        const response = await messageApi.getAllChatMessages(payload.chatId, payload.limit, payload.from);
         return response.data;
     }
 );

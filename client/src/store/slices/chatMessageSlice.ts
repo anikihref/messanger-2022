@@ -49,7 +49,7 @@ export const chatMessageSlice = createSlice({
         [fetchMessages.fulfilled.type]: (state, action: PayloadAction<IChatMessage[]>) => {
             state.isLoading = false;
             state.error = '';
-            state.messages = action.payload;
+            state.messages = [...action.payload, ...state.messages]
         },
         [fetchMessages.rejected.type]: (state, action: PayloadAction<string>) => {
             state.isLoading = false;
