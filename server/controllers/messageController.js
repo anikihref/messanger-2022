@@ -66,7 +66,8 @@ class MessageController {
         try {
           const messages = await messageService.getAllChatMessages(
             req.params.chatId,
-            req.query.limit
+            +req.query.limit,
+            +req.query.from
           );
     
           res.json(messages);
