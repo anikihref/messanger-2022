@@ -4,7 +4,7 @@ import mongoose from 'mongoose'
 
 class MessageService {
     async create(message) {
-        const doc = await MessageModel.create(message);
+        const doc = await (await MessageModel.create(message)).populate('creator');
         return new MessageDto(doc);
     }
 
@@ -13,7 +13,7 @@ class MessageService {
     }
 
     async edit(message, messageId) {
-        const doc = await MessageModel.findById(messageId);
+        const doc = (await MessageModel.findById(messageId)).populate('creator');
 
         doc.content = message;
         await doc.save();
@@ -21,15 +21,19 @@ class MessageService {
     }
 
     async getMessage(messageId) {
-        const doc = await MessageModel.findById(messageId);
+        const doc = await MessageModel.findById(messageId).populate('creator');
 
         return new MessageDto(doc);
     }
 
-    async getAllChatMessages(chatId, limit = 50) {
-        const docs = await MessageModel.find({chat: mongoose.Types.ObjectId(chatId)}).limit(limit);
+    async getAllChatMessages(chatId, limit = 50, from = 0) {
+        const docs = await MessageModel.find({chat: mongoose.Types.ObjectId(chatId)})
+            .sort({createdAt: -1})
+            .limit(limit)
+            .populate('creator');
 
-        return docs.map(doc => new MessageDto(doc));
+        const result = docs.slice(from).reverse();
+        return result.map(doc => new MessageDto(doc));
     }
 
     async deleteAllChatMessages(chatId) {

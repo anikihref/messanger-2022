@@ -35,13 +35,21 @@ export const chatMessageSlice = createSlice({
         
         select(state, action: PayloadAction<IChatMessage>) {
             state.selectedMessage = action.payload;
+        },
+
+        addMessage(state, action: PayloadAction<IChatMessage>) {
+            state.messages.push(action.payload)
+        },
+
+        reset(state) {
+            state.messages = [];
         }
     },
     extraReducers: {
         [fetchMessages.fulfilled.type]: (state, action: PayloadAction<IChatMessage[]>) => {
             state.isLoading = false;
             state.error = '';
-            state.messages = action.payload;
+            state.messages = [...action.payload, ...state.messages]
         },
         [fetchMessages.rejected.type]: (state, action: PayloadAction<string>) => {
             state.isLoading = false;

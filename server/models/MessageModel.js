@@ -13,8 +13,8 @@ const messageSchema = new mongoose.Schema({
       message: 'Max message number reached',
     },
   },
-  createdAt: { type: Date, default: new Date() },
-  updatedAt: { type: Date, default: new Date() },
+  createdAt: { type: Date, default: () => new Date() },
+  updatedAt: { type: Date, default: () => new Date() },
   chat: { type: mongoose.SchemaTypes.ObjectId, required: true, ref: 'Chat' },
   creator: { type: mongoose.SchemaTypes.ObjectId, required: true, ref: 'User' },
   type: {

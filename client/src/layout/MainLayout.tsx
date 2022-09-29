@@ -21,7 +21,7 @@ const MainLayout = () => {
 
   return (
     <div className='h-full  bg-neutral'>
-      <div className='container max-h-[90%] flex'>
+      <div className='container max-h-[90%] h-full flex'>
         {/* Chatlist */}
         <div className='w-[40%] p-5 flex flex-col gap-y-2 overflow-y-auto'>
           {chats.toString() ? (
@@ -50,7 +50,7 @@ const MainLayout = () => {
         </div>
 
         {/* Custom content */}
-        <div className='grow overflow-y-auto p-2'>
+        <div className='grow p-2 h-full'>
           <Outlet />
         </div>
       </div>

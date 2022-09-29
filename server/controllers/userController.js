@@ -69,7 +69,7 @@ class UserController {
 
     async getUser(req, res) {
         try {
-            const {searchType: key, value} = req.query;
+            const {key, value} = req.query;
 
             const data = await userService.getUser(key, value);
             res.json(data);

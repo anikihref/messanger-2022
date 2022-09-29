@@ -1,3 +1,4 @@
+import { IUser } from './user';
 import { ImageType, MongooseIDType } from './index';
 
 export interface IChatMessage {
@@ -5,7 +6,7 @@ export interface IChatMessage {
     content: string | ImageType;
     createdAt: Date;
     updatedAt: Date;
-    creator: MongooseIDType; // User
+    creator: IUser; // User
     chat: MongooseIDType; // Chat
     type: 'text' | 'image';
 }
