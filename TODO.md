@@ -2,31 +2,31 @@
 
 ## Pages
 
-### Search page
+#### Search page
 
 - [ ] Create result item component
 - [ ] Implement logic for searching (server)
 
-### Settings page
+#### Settings page
 
 - [ ] Create settings Schema and add it for every user
 - [ ] Show, hide etc. some components depending on settings 
 
-### User page
+#### User page
 
 - [ ] Show user info
 - [ ] Add last 3 chats component
 - [ ] Add friend section 
     - [ ] Add modal with all friends
 
-### Auth pages
+#### Auth pages
 
 - [ ] Create login page
 - [ ] Create registration page
 - [ ] Create activation page
 
-### Not found page
-    - [ ] Create not found page
+#### Not found page
+- [ ] Create not found page
 
 ## WebSockets
 
