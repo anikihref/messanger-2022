@@ -1,20 +1,28 @@
 import express from 'express';
+import WebSocket, {WebSocketServer } from 'ws'
 import mongoose from 'mongoose'
 import cors from 'cors';
-import ws from 'express-ws'
 import { config } from 'dotenv';
 import { userRouter } from './routers/user.js';
 import { messageRouter } from './routers/message.js';
 import { chatRouter } from './routers/chat.js';
+import { onClose, onConnect } from './ws.js';
 
 const app = express();
-const WSServer = ws(app);
+export const wsServer = new WebSocketServer({ port: 8000 });
+
+// ws server listeners
+wsServer.on('connection', onConnect)
+wsServer.on('close', onClose)
+
 // dotenv config
 config();
+
 // middlewares
 app.use(cors());
 app.use(express.json());
 app.use('/static', express.static('static'));
+
 // routes
 app.use('/chat', chatRouter);
 app.use('/user', userRouter);

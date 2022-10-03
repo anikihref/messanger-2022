@@ -7,20 +7,28 @@ import Loader from '../components/Loader';
 import { useTypedDispatch, useTypedSelector } from '../hooks/redux'
 import { fetchMessages } from '../store/actions/fetchMessages';
 import { chatMessageSlice } from '../store/slices/chatMessageSlice';
-import { ImageType } from '../types';
+import { ImageType, MongooseIDType } from '../types';
 import {BiImageAdd} from 'react-icons/bi'
 import {FiSend} from 'react-icons/fi';
 import Button from '../components/Button';
 import { usePrevious } from '../hooks/usePrevious';
+import { IChatMessage } from '../types/chatMessage';
 
 interface MessageInput {
   image: ImageType;
   message: string;
 }
 
+interface WSMessage {
+  type: 'message' | 'connectionMessage' | 'closeMessage';
+  roomId?: MongooseIDType; // chat id
+  connectionId: MongooseIDType; // user id
+  message?: IChatMessage;
+}
+
 enum MessageFetch {
   FetchStart = 10,
-  FetchLoad = 5
+  FetchLoad = 15
 }
 
 
@@ -34,6 +42,7 @@ const ChatPage = () => {
   const messageList = useRef<HTMLDivElement>(null);
   const lastMessageElement = useRef<HTMLDivElement>(null)
   const fetchFromPoint = usePrevious(messageLimit);
+  const [socket, setSocket] = useState<WebSocket | null>()
 
   const {
     register,
@@ -42,18 +51,43 @@ const ChatPage = () => {
   } = useForm<MessageInput>()
 
   useEffect(() => {
-    if (!id) return;
-
+    if (!id || !user) return;
+    let socket = new WebSocket('ws://localhost:8000')
+    setSocket(socket)
+    
     dispatch(fetchMessages({
       chatId: id,
       limit: messageLimit,
       from: fetchFromPoint
-    })).then(() => {
-      scrollToBottom();
-    });
+    }))
+      .then(() => {
+        scrollToBottom();
+      });
+      
+      socket.addEventListener('open', () => {
+        socket?.send(JSON.stringify({
+          type: 'connectionMessage',
+          roomId: id,
+          connectionId: user?.id,
+        } as WSMessage))
+      })
+
+    socket?.addEventListener('message', ({ data }) => {
+      const {message} = JSON.parse(data)
+      
+      dispatch(chatMessageSlice.actions.addMessage(message))
+      setTimeout(scrollToBottom, 0)
+    })
 
     return () => {
       dispatch(chatMessageSlice.actions.reset())
+
+      socket?.send(JSON.stringify({
+        connectionId: user?.id,
+        type: 'closeMessage'
+      } as WSMessage))
+      
+      socket?.close();
     }
   }, [id])
 
@@ -67,8 +101,7 @@ const ChatPage = () => {
       from: fetchFromPoint
     }))
       .then(() => {
-          lastMessageElement?.current?.scrollIntoView()
-        
+        lastMessageElement?.current?.scrollIntoView()
       })
 
   }, [messageLimit])
@@ -91,16 +124,22 @@ const ChatPage = () => {
         setIsSending(false);
         dispatch(chatMessageSlice.actions.addMessage(data))
         setTimeout(scrollToBottom, 0)
+
+        socket?.send(JSON.stringify({
+          type: 'message',
+          message: data,
+          connectionId: user.id,
+          roomId: id
+        } as WSMessage))
       })
 
-    setIsSending(true)
     reset();
   })
 
   function scrollToBottom() {
     messageList.current?.scrollTo({
       top: messageList.current?.scrollHeight
-    })
+    });
   }
   
   return (
