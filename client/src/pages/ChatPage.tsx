@@ -7,30 +7,23 @@ import Loader from '../components/Loader';
 import { useTypedDispatch, useTypedSelector } from '../hooks/redux'
 import { fetchMessages } from '../store/actions/fetchMessages';
 import { chatMessageSlice } from '../store/slices/chatMessageSlice';
-import { ImageType, MongooseIDType } from '../types';
+import { ImageType, JSONString, WSMessage } from '../types';
 import {BiImageAdd} from 'react-icons/bi'
 import {FiSend} from 'react-icons/fi';
 import Button from '../components/Button';
 import { usePrevious } from '../hooks/usePrevious';
-import { IChatMessage } from '../types/chatMessage';
+import { socket } from '../layout/MainLayout';
+import { scrollToBottom } from '../helpers/scrollToBottom';
 
 interface MessageInput {
   image: ImageType;
   message: string;
 }
 
-interface WSMessage {
-  type: 'message' | 'connectionMessage' | 'closeMessage';
-  roomId?: MongooseIDType; // chat id
-  connectionId: MongooseIDType; // user id
-  message?: IChatMessage;
-}
-
 enum MessageFetch {
   FetchStart = 10,
   FetchLoad = 15
 }
-
 
 const ChatPage = () => {
   const dispatch = useTypedDispatch();
@@ -42,7 +35,6 @@ const ChatPage = () => {
   const messageList = useRef<HTMLDivElement>(null);
   const lastMessageElement = useRef<HTMLDivElement>(null)
   const fetchFromPoint = usePrevious(messageLimit);
-  const [socket, setSocket] = useState<WebSocket | null>()
 
   const {
     register,
@@ -50,46 +42,41 @@ const ChatPage = () => {
     reset
   } = useForm<MessageInput>()
 
+
+  useEffect(() => {
+    socket?.addEventListener('message', handleWebSocketMessage)
+
+    return () => {
+      socket?.removeEventListener('message', handleWebSocketMessage)
+    }
+  }, [])
+
+
+  
   useEffect(() => {
     if (!id || !user) return;
-    let socket = new WebSocket('ws://localhost:8000')
-    setSocket(socket)
-    
+
     dispatch(fetchMessages({
       chatId: id,
       limit: messageLimit,
-      from: fetchFromPoint
+      from: fetchFromPoint! >= messageLimit ? 0 : fetchFromPoint
     }))
       .then(() => {
-        scrollToBottom();
+        scrollToBottom(messageList.current);
+        handleWebSocketOpen()
+
+        socket?.send(JSON.stringify({
+          connectionId: user.id,
+          roomId: id,
+          type: 'changeRoom'
+        } as WSMessage))
       });
       
-      socket.addEventListener('open', () => {
-        socket?.send(JSON.stringify({
-          type: 'connectionMessage',
-          roomId: id,
-          connectionId: user?.id,
-        } as WSMessage))
-      })
-
-    socket?.addEventListener('message', ({ data }) => {
-      const {message} = JSON.parse(data)
-      
-      dispatch(chatMessageSlice.actions.addMessage(message))
-      setTimeout(scrollToBottom, 0)
-    })
 
     return () => {
       dispatch(chatMessageSlice.actions.reset())
-
-      socket?.send(JSON.stringify({
-        connectionId: user?.id,
-        type: 'closeMessage'
-      } as WSMessage))
-      
-      socket?.close();
     }
-  }, [id])
+  }, [id, user])
 
   useEffect(() => {
     if (!id) return;
@@ -103,8 +90,22 @@ const ChatPage = () => {
       .then(() => {
         lastMessageElement?.current?.scrollIntoView()
       })
-
   }, [messageLimit])
+
+  function handleWebSocketMessage({data}: {data: JSONString}) {
+    const {message} = JSON.parse(data)
+      console.log(1)
+    dispatch(chatMessageSlice.actions.addMessage(message))
+    setTimeout(() => scrollToBottom(messageList.current), 0)
+  }
+
+  function handleWebSocketOpen() {
+    socket?.send(JSON.stringify({
+      type: 'connectionMessage',
+      roomId: id,
+      connectionId: user?.id,
+    } as WSMessage))
+  }
 
   const onSend = handleSubmit((data) => {
     let messageType: 'image' | 'text' = data.image.length ? 'image' : 'text';
@@ -123,7 +124,7 @@ const ChatPage = () => {
       .then(({data}) => {
         setIsSending(false);
         dispatch(chatMessageSlice.actions.addMessage(data))
-        setTimeout(scrollToBottom, 0)
+        setTimeout(() => scrollToBottom(messageList.current), 0)
 
         socket?.send(JSON.stringify({
           type: 'message',
@@ -135,12 +136,6 @@ const ChatPage = () => {
 
     reset();
   })
-
-  function scrollToBottom() {
-    messageList.current?.scrollTo({
-      top: messageList.current?.scrollHeight
-    });
-  }
   
   return (
     <div className='flex flex-col justify-end h-full max-h-full'>     

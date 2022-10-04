@@ -74,5 +74,6 @@ Auth implemented using **JWT**
 - [ ] Main layout chat list fetching (like messages)
 - [ ] When message has many symbols it occurs error
 - [ ] Last message of chat doesn't show
-- [ ] Messages not fetching when changing chat
-- [ ] WebSocket sometimes does not return response to another client and sometimes return two of them
+- [x] Messages not fetching when changing chat
+- [x] WebSocket sometimes does not return response to another client and sometimes return two of them
+- [ ] If page renders already on chat page than no users get response
