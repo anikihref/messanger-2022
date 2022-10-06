@@ -25,12 +25,12 @@ function App() {
 
       <Route path='/' element={<MainLayout />}>
         <Route index element={<MainPage />}></Route>
-        <Route path='user/:id' element={<UserPage />} />
         <Route path='search' element={<SearchPage />} />
         <Route path='chat/:id' element={<ChatPage />} />
       </Route>
 
       <Route path='/' element={<FullpageLayout />}>
+        <Route path='user/:id' element={<UserPage />} />
         <Route path='profile' element={<ProfilePage />} />
         <Route path='settings' element={<SettingsPage />} />
       </Route>
