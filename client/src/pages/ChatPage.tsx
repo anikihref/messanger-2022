@@ -7,11 +7,13 @@ import Loader from '../components/Loader';
 import { useTypedDispatch, useTypedSelector } from '../hooks/redux'
 import { fetchMessages } from '../store/actions/fetchMessages';
 import { chatMessageSlice } from '../store/slices/chatMessageSlice';
-import { ImageType } from '../types';
+import { ImageType, JSONString, WSMessage } from '../types';
 import {BiImageAdd} from 'react-icons/bi'
 import {FiSend} from 'react-icons/fi';
 import Button from '../components/Button';
 import { usePrevious } from '../hooks/usePrevious';
+import { socket } from '../layout/MainLayout';
+import { scrollToBottom } from '../helpers/scrollToBottom';
 
 interface MessageInput {
   image: ImageType;
@@ -20,9 +22,8 @@ interface MessageInput {
 
 enum MessageFetch {
   FetchStart = 10,
-  FetchLoad = 5
+  FetchLoad = 15
 }
-
 
 const ChatPage = () => {
   const dispatch = useTypedDispatch();
@@ -41,21 +42,41 @@ const ChatPage = () => {
     reset
   } = useForm<MessageInput>()
 
+
   useEffect(() => {
-    if (!id) return;
+    socket?.addEventListener('message', handleWebSocketMessage)
+
+    return () => {
+      socket?.removeEventListener('message', handleWebSocketMessage)
+    }
+  }, [])
+
+
+  
+  useEffect(() => {
+    if (!id || !user) return;
 
     dispatch(fetchMessages({
       chatId: id,
       limit: messageLimit,
-      from: fetchFromPoint
-    })).then(() => {
-      scrollToBottom();
-    });
+      from: fetchFromPoint! >= messageLimit ? 0 : fetchFromPoint
+    }))
+      .then(() => {
+        scrollToBottom(messageList.current);
+        handleWebSocketOpen()
+
+        socket?.send(JSON.stringify({
+          connectionId: user.id,
+          roomId: id,
+          type: 'changeRoom'
+        } as WSMessage))
+      });
+      
 
     return () => {
       dispatch(chatMessageSlice.actions.reset())
     }
-  }, [id])
+  }, [id, user])
 
   useEffect(() => {
     if (!id) return;
@@ -67,11 +88,24 @@ const ChatPage = () => {
       from: fetchFromPoint
     }))
       .then(() => {
-          lastMessageElement?.current?.scrollIntoView()
-        
+        lastMessageElement?.current?.scrollIntoView()
       })
-
   }, [messageLimit])
+
+  function handleWebSocketMessage({data}: {data: JSONString}) {
+    const {message} = JSON.parse(data)
+      console.log(1)
+    dispatch(chatMessageSlice.actions.addMessage(message))
+    setTimeout(() => scrollToBottom(messageList.current), 0)
+  }
+
+  function handleWebSocketOpen() {
+    socket?.send(JSON.stringify({
+      type: 'connectionMessage',
+      roomId: id,
+      connectionId: user?.id,
+    } as WSMessage))
+  }
 
   const onSend = handleSubmit((data) => {
     let messageType: 'image' | 'text' = data.image.length ? 'image' : 'text';
@@ -90,18 +124,18 @@ const ChatPage = () => {
       .then(({data}) => {
         setIsSending(false);
         dispatch(chatMessageSlice.actions.addMessage(data))
-        setTimeout(scrollToBottom, 0)
+        setTimeout(() => scrollToBottom(messageList.current), 0)
+
+        socket?.send(JSON.stringify({
+          type: 'message',
+          message: data,
+          connectionId: user.id,
+          roomId: id
+        } as WSMessage))
       })
 
-    setIsSending(true)
     reset();
   })
-
-  function scrollToBottom() {
-    messageList.current?.scrollTo({
-      top: messageList.current?.scrollHeight
-    })
-  }
   
   return (
     <div className='flex flex-col justify-end h-full max-h-full'>     

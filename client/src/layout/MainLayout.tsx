@@ -6,6 +6,11 @@ import NavbarTrigger from '../components/NavbarTrigger';
 import { useTypedDispatch, useTypedSelector } from '../hooks/redux';
 import { fetchChats } from '../store/actions/fetchChats';
 import {AiOutlineCloudDownload} from 'react-icons/ai'
+import { WSMessage } from '../types';
+
+export let socket: WebSocket | null;
+
+
 
 const MainLayout = () => {
   const dispatch = useTypedDispatch();
@@ -14,10 +19,40 @@ const MainLayout = () => {
   const [chatsLimit, setChatsLimit] = useState<number>(20);
 
   useEffect(() => {
+    window.addEventListener('beforeunload', () => {
+      socket?.send(JSON.stringify({
+        connectionId: user?.id,
+        type: 'closeMessage'
+      } as WSMessage))
+      
+      socket?.close()
+    })
+  })
+
+  useEffect(() => {
+    socket = new WebSocket('ws://localhost:8000');
+
+    return () => {
+      socket?.send(JSON.stringify({
+        connectionId: user?.id,
+        type: 'closeMessage'
+      } as WSMessage))
+      
+      socket?.close();
+      socket = null
+    }
+  }, [])
+
+  useEffect(() => {
+
     if (user) {
       dispatch(fetchChats({ userId: user.id, limit: chatsLimit }));
     }
+
+    
   }, [user, chatsLimit]);
+
+ 
 
   return (
     <div className='h-full  bg-neutral'>
