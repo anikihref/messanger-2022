@@ -1,5 +1,6 @@
 import React from 'react'
 import { IUser } from '../types/user'
+import StatusButton from './StatusButton'
 
 interface UserInfoProps {
     user: IUser
@@ -14,7 +15,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
             <div>
 
                 {/* Status */}
-                <div></div>
+                <StatusButton status={user.status} />
             </div>
 
             {/* Username */}

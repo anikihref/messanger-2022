@@ -1,6 +1,13 @@
 import React from 'react'
+import { MongooseIDType } from '../types'
 
-const UserActionBar = () => {
+interface UserActionBarProps {
+    userId: MongooseIDType;
+}
+
+const UserActionBar: React.FC<UserActionBarProps> = ({ userId }) => {
+    
+
   return (
     <div>
         {/* Add friend or Remove friend button */}

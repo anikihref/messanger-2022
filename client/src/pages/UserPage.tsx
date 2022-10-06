@@ -36,9 +36,7 @@ const UserPage = () => {
         <>
           <UserInfo user={selectedUser} />
 
-          <FriendList friends={selectedUser.friends} />
-
-          <UserActionBar />
+          <UserActionBar userId={selectedUser.id} />
         </>
       ) : (
         <div>user not found</div>
