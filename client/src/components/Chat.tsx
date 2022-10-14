@@ -22,7 +22,7 @@ const Chat: React.FC<ChatProps> = ({ chat }) => {
         setOtherMember(data)
       })
     
-  })
+  }, [])
 
   return (
     <Link 
