@@ -4,12 +4,9 @@ import Chat from '../components/Chat';
 import NavbarTrigger from '../components/NavbarTrigger';
 import { useTypedDispatch, useTypedSelector } from '../hooks/redux';
 import { fetchChats } from '../store/actions/fetchChats';
-import {AiOutlineCloudDownload} from 'react-icons/ai'
 import { WSMessage } from '../types';
 
 export let socket: WebSocket | null;
-
-
 
 const MainLayout = () => {
   const dispatch = useTypedDispatch();
@@ -47,8 +44,6 @@ const MainLayout = () => {
     if (user) {
       dispatch(fetchChats({ userId: user.id, limit: chatsLimit }));
     }
-
-    
   }, [user, chatsLimit]);
 
  

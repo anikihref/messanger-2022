@@ -140,7 +140,7 @@ const ChatPage = () => {
     <div className='flex flex-col bg-purple-400 h-full relative'>   
         
       {/* message list */}
-      <div className={`overflow-y-auto pr-[90px] scrollbar-thin scrollbar-thumb-purple-100 scrollbar-track-purple-300`} ref={messageList}>
+      <div className={`overflow-y-auto pr-[90px] scrollbar-thin scrollbar-thumb-purple-100 scrollbar-track-purple-300 grow`} ref={messageList}>
         <div className='flex flex-col gap-y-3 pl-5 pr-6 my-4 grow'>
           {/* load more */}
             {messages.length >= messageLimit && (
@@ -167,7 +167,7 @@ const ChatPage = () => {
       </div>
       
 
-      {isLoading && <div className='mx-auto'><Loader /></div>}
+      {!isLoading && <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'><Loader /></div>}
       
       {isSending && (
         <div className='text-center font-title text-lg mt-5 mx-auto gap-4 flex'>
@@ -181,7 +181,7 @@ const ChatPage = () => {
       )}
 
       {/* Send message form */}
-      <form className='flex h-[60px] bg-purple-300 px-3.5 py-2.5 gap-x-5 z-[100] ' onSubmit={onSend}>
+      <form className='flex h-[60px] bg-purple-300 px-3.5 py-2.5 gap-x-5 z-[100]' onSubmit={onSend}>
         <div className='aspect-square h-full overflow-hidden bg-hot-300 bg-purple-100'>
           <input className='absolute opacity-0 -z-[1] max-w-full overflow-hidden'  {...register('image')} name='image' id='image' type='file' alt='image' />
 
