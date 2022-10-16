@@ -22,32 +22,29 @@ const Chat: React.FC<ChatProps> = ({ chat }) => {
         setOtherMember(data)
       })
     
-  })
+  }, [])
 
   return (
     <Link 
       to={`/chat/${chat.id}`}
-      className='flex p-5  border-[3px] border-cold-200'
+      className='flex p-4  bg-blue-200 h-[100px]'
     >
       {/* avatar */}
 
         {otherMember &&
-          <div className='min-w-[40px] max-w-[15%] flex items-center'>
+          <div className='w-[70px] aspect-square flex items-center'>
             <img className='max-w-full max-h-full rounded-full' src={'http://localhost:5000/static/empty_avatar.png'} alt="avatar" />
           </div>
         }
     
       
 
-      <div className='ml-5 text-left'>
+      <div className='text-left flex flex-col justify-around ml-3.5'>
         {/* title */}
-        <h5 className='font-title font-[700] mb-1'>{chat.title}</h5>
+        <h5 className='font-title text-2xl text-white'>{chat.title}</h5>
         {/* last message */}
-        <div className='font-content text-left w-[220px] truncate'>{chat.lastMessage}</div>
-      </div>
-
-      {/* options */}
-      <div></div>
+        <div className='font-content text-left text-lg text-white'>{chat.lastMessage}</div>
+      </div>  
     </Link>
   )
 }

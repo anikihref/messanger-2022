@@ -3,7 +3,9 @@ import '../css/loader.css'
 
 const Loader = () => {
   return (
-    <div className="lds-ripple"><div></div><div></div></div>
+    <div className='bg-blue-300 flex  pt-4 pl-4 pr-3 pb-3 rounded-lg'>
+      <div className="lds-ripple"><div></div><div></div></div>
+    </div>
   )
 }
 

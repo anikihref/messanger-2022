@@ -8,12 +8,11 @@ import { useTypedDispatch, useTypedSelector } from '../hooks/redux'
 import { fetchMessages } from '../store/actions/fetchMessages';
 import { chatMessageSlice } from '../store/slices/chatMessageSlice';
 import { ImageType, JSONString, WSMessage } from '../types';
-import {BiImageAdd} from 'react-icons/bi'
 import {FiSend} from 'react-icons/fi';
-import Button from '../components/Button';
 import { usePrevious } from '../hooks/usePrevious';
 import { socket } from '../layout/MainLayout';
 import { scrollToBottom } from '../helpers/scrollToBottom';
+import SvgSelector from '../components/SvgSelector';
 
 interface MessageInput {
   image: ImageType;
@@ -138,31 +137,38 @@ const ChatPage = () => {
   })
   
   return (
-    <div className='flex flex-col justify-end h-full max-h-full'>     
+    <div className='flex flex-col bg-purple-400 h-full relative'>   
+        
       {/* message list */}
-      <div className={`flex flex-col grow gap-5 mt-3 overflow-auto`} ref={messageList}>
-        {/* load more */}
-        <div className='w-[30%] mx-auto'>
-          {messages.length >= messageLimit && (
-            <Button onClick={() => setMessageLimit(prev => prev + MessageFetch.FetchLoad)}>
-              <div className='py-3 flex items-center ml-[10%] text-lg'>Load more</div>
-            </Button>
-          )}
-        </div>
+      <div className={`overflow-y-auto pr-[90px] scrollbar-thin scrollbar-thumb-purple-100 scrollbar-track-purple-300 grow`} ref={messageList}>
+        <div className='flex flex-col gap-y-3 pl-5 pr-6 my-4 grow'>
+          {/* load more */}
+            {messages.length >= messageLimit && (
+              <button 
+                className='mx-auto bg-purple-100 text-white font-title w-1/4 py-2 text-lg mb-4'
+                onClick={() => setMessageLimit(prev => prev + MessageFetch.FetchLoad)}
+              >
+                Load more
+              </button>
+            )}
+          
 
-        {messages.toString() ? (
-          messages.map((message, index) => (
-            <div ref={index === MessageFetch.FetchLoad ? lastMessageElement : null} key={message.id}>
-              <ChatMessage  message={message}/>
-            </div>
-          ))
-        ) : 
-          !isLoading && <div>no messages yet</div>
-        }
+          {/* messages */}
+          {messages.toString() ? (
+            messages.map((message, index) => (
+              <div ref={index === MessageFetch.FetchLoad ? lastMessageElement : null} key={message.id}>
+                <ChatMessage  message={message}/>
+              </div>
+            ))
+          ) : 
+            !isLoading && <div>no messages yet</div>
+          }
+        </div>
       </div>
       
 
-      {isLoading && <div className='mx-auto'><Loader /></div>}
+      {!isLoading && <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'><Loader /></div>}
+      
       {isSending && (
         <div className='text-center font-title text-lg mt-5 mx-auto gap-4 flex'>
           <div>
@@ -172,26 +178,30 @@ const ChatPage = () => {
             <FiSend size={'100%'} />
           </div>
         </div>
-      )
-      }
-      {/* send message form */}
-      <form className='flex h-[60px] border-[3px] border-cold-200 mt-7' onSubmit={onSend}>
-        <div className='h-full flex grow items-center '>
-          <label htmlFor='message'></label>
-          <input className='px-2 py-1 w-full bg-cold-300 h-full text-white outline-none duration-500 focus:bg-hot-100 focus:text-cold-300' {...register('message')}  name='message' id='message' type={'text'} />
-        </div>
+      )}
 
-        <div className='aspect-square h-full overflow-hidden bg-hot-300'>
+      {/* Send message form */}
+      <form className='flex h-[60px] bg-purple-300 px-3.5 py-2.5 gap-x-5 z-[100]' onSubmit={onSend}>
+        <div className='aspect-square h-full overflow-hidden bg-hot-300 bg-purple-100'>
           <input className='absolute opacity-0 -z-[1] max-w-full overflow-hidden'  {...register('image')} name='image' id='image' type='file' alt='image' />
 
           {/* custom image picker */}
-          <label htmlFor='image' className='w-full h-full flex items-center justify-center text-cold-100 cursor-pointer'>
-            <BiImageAdd size={'60%'}  />
+          <label htmlFor='image' className='w-full h-full flex items-center justify-center text-cold-100 cursor-pointer p-1.5'>
+            <SvgSelector id='image' />
           </label>
         </div>
 
-        <button className='aspect-[2/1] bg-hot-200 ' type='submit'>send</button>
+        <div className='h-full flex grow items-center '>
+          <label htmlFor='message'></label>
+          <input className='bg-purple-100 placeholder:text-white placeholder:opacity-70 px-2.5 py-1.5 w-full h-full text-white' {...register('message')} placeholder='Type message...'  name='message' id='message' type={'text'} />
+        </div>
+
+        <button className=' bg-purple-100 text-xl text-white font-title w-[15%]' type='submit'>Send</button>
       </form>
+
+        {/* avatar bar */}
+        <div className='w-[90px] bg-blue-400 absolute top-0 bottom-0 right-0'>
+        </div>
     </div>
   )
 }
