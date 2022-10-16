@@ -1,8 +1,23 @@
 import React from 'react'
+import { IUser } from '../types/user';
+import StatusButton from './StatusButton';
 
-const UserAccountButton = () => {
+interface UserAccountButtonProps {
+  user: IUser
+}
+
+const UserAccountButton: React.FC<UserAccountButtonProps> = ({ user }) => {
   return (
-    <div>UserAccountButton</div>
+    <div>
+      {/* Avatar */}
+      <div>
+        {/* status */}
+        <StatusButton status={user.status} />
+      </div>
+
+      {/* username */}
+      <div></div>
+    </div>
   )
 }
 
