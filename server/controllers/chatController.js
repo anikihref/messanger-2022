@@ -118,6 +118,21 @@ class ChatController {
         .status(400);
     }
   }
+
+  async getLastChats(req, res) {
+    try {
+      const {limit} = req.query;
+      const {userId} = req.params
+
+      const chats = await chatService.getLastChats(userId, limit);
+
+      res.json(chats)
+    } catch (error) {
+      res.json({
+        message: error.message,
+      })
+    }
+  }
 }
 
 export default new ChatController();

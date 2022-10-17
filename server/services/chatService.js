@@ -70,6 +70,25 @@ class ChatService {
 
         await doc.save()
     }
+
+    async getLastChats(userId, limit = 3) {
+        let userChats = await ChatModel.find({members: {$in: mongoose.Types.ObjectId(userId)}})
+            .populate('lastMessage')
+
+        userChats = userChats.sort((chat1, chat2) => {
+            console.log(chat1)
+            if (chat1.lastMessage.updatedAt.getTime() > chat2.lastMessage.updatedAt.getTime()) {
+                return -1
+            } else if (chat1.lastMessage.updatedAt.getTime() > chat2.lastMessage.updatedAt.getTime()) {
+                return 1
+            } else {
+                return 0
+            }
+        }) 
+        
+
+        return userChats
+    }
 }
 
 export default new ChatService();
