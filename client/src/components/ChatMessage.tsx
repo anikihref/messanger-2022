@@ -14,9 +14,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   const user = useTypedSelector((state) => state.user.user);
 
   return (
-    <div className='relative'>
       <div
-        className={`bg-blue-200 max-w-[45%] p-2.5 relative ${
+        className={`bg-blue-200 max-w-[65%] w-fit min-w-[50%] p-2.5 relative ${
           creator.id === user?.id ? 'ml-auto' : ''
         }`}
       >
@@ -39,15 +38,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           {content}
         </div>
       </div>
-
-      <div className='absolute -right-[14%] top-1/2 -translate-y-1/2 w-[50px] aspect-square bg-gray-300 rounded-full overflow-hidden z-[10]'>
-        
-        <img src={'http://localhost:5000/static/empty_avatar.png'} alt='avatar'/>
-        {/* <img src={creator.avatar || 'http://localhost:5000/static/empty_avatar.png'} alt='avatar'/> */}
-      </div>
-    </div>
-      
-
   );
 };
 
