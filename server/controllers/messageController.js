@@ -6,7 +6,7 @@ class MessageController {
         try {
             const message = req.body.data;
             const createdMessage = await messageService.create(message);
-            await chatService.setLastMessage(message.chat, createdMessage._id)
+            await chatService.setLastMessage(message.chat, createdMessage.id)
           
             res.json(createdMessage)
         } catch (error) {
