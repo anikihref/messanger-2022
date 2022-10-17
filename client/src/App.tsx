@@ -13,7 +13,7 @@ function App() {
   const dispatch = useTypedDispatch();
 
   useEffect(() => {
-    dispatch(fetchUser('grandwar39@gmail.com'))
+    dispatch(fetchUser('grandwar319a@gmail.com'))
   }, [])
 
   return (

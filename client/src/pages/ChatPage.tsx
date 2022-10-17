@@ -19,9 +19,9 @@ interface MessageInput {
   message: string;
 }
 
-enum MessageFetch {
-  FetchStart = 10,
-  FetchLoad = 15
+enum MessageFetchCount {
+  FetchStart = 50,
+  FetchLoad = 30
 }
 
 const ChatPage = () => {
@@ -29,7 +29,7 @@ const ChatPage = () => {
   const {id} = useParams();
   const {messages, isLoading} = useTypedSelector(state => state.chatMessage);
   const {user} = useTypedSelector(state => state.user);
-  const [messageLimit, setMessageLimit] = useState<number>(MessageFetch.FetchStart);
+  const [messageLimit, setMessageLimit] = useState<number>(MessageFetchCount.FetchStart);
   const [isSending, setIsSending] = useState(false);
   const messageList = useRef<HTMLDivElement>(null);
   const lastMessageElement = useRef<HTMLDivElement>(null)
@@ -72,14 +72,14 @@ const ChatPage = () => {
       });
       
 
-    return () => {
+    return () => {  
       dispatch(chatMessageSlice.actions.reset())
     }
   }, [id, user])
 
   useEffect(() => {
     if (!id) return;
-    if (messageLimit === MessageFetch.FetchStart) return;
+    if (messageLimit === MessageFetchCount.FetchStart) return;
 
     dispatch(fetchMessages({
       chatId: id,
@@ -135,39 +135,51 @@ const ChatPage = () => {
 
     reset();
   })
-  
-  return (
-    <div className='flex flex-col bg-purple-400 h-full relative'>   
+
+    return (
+    <div className='flex flex-col justify-end bg-purple-400 h-full relative'>   
         
       {/* message list */}
-      <div className={`overflow-y-auto pr-[90px] scrollbar-thin scrollbar-thumb-purple-100 scrollbar-track-purple-300 grow`} ref={messageList}>
-        <div className='flex flex-col gap-y-3 pl-5 pr-6 my-4 grow'>
-          {/* load more */}
-            {messages.length >= messageLimit && (
-              <button 
-                className='mx-auto bg-purple-100 text-white font-title w-1/4 py-2 text-lg mb-4'
-                onClick={() => setMessageLimit(prev => prev + MessageFetch.FetchLoad)}
-              >
-                Load more
-              </button>
-            )}
-          
-
-          {/* messages */}
+      <div className={`overflow-y-auto scrollbar-thin scrollbar-thumb-purple-100 scrollbar-track-purple-300 grow`} ref={messageList}>
+        {/* load more */}
+        {messages.length >= messageLimit && (
+          <button 
+            className='mx-auto bg-purple-100 text-white font-title w-1/4 py-2 text-lg mb-4'
+            onClick={() => setMessageLimit(prev => prev + MessageFetchCount.FetchLoad)}
+          >
+            Load more
+          </button>
+        )}
+        
+        {/* messages */}
+        <div className='grid grid-cols-[1fr_auto] pl-3 pr-2'>
           {messages.toString() ? (
             messages.map((message, index) => (
-              <div ref={index === MessageFetch.FetchLoad ? lastMessageElement : null} key={message.id}>
-                <ChatMessage  message={message}/>
-              </div>
+              <React.Fragment key={message.id}>
+                {/* message */}
+                <div 
+                  className={`mr-5 mb-4 ${index === 0 ? 'mt-4' : 'mt-0'}`} 
+                  ref={index === MessageFetchCount.FetchLoad ? lastMessageElement : null}
+                >
+                  <ChatMessage  message={message}/>
+                </div>
+
+                {/* avatar */}
+                <div className={`bg-blue-400 w-fit flex items-center px-4 relative pb-4 ${index === 0 ? 'pt-4' : 'pt-0'} ${index === 0 ? 'before:absolute before:bg-blue-400 before:w-full before:h-screen before:right-0 before:top-0' : ''}`}>
+                  <div className='bg-gray-300 rounded-full w-[50px] aspect-square overflow-hidden z-[100]'>
+                    <img src="http://localhost:5000/static/empty_avatar.png" alt="avatar" />
+                  </div>
+                </div>
+              </React.Fragment>
             ))
           ) : 
-            !isLoading && <div>no messages yet</div>
-          }
+          !isLoading && <div>no messages yet</div>
+        }
         </div>
       </div>
       
 
-      {!isLoading && <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'><Loader /></div>}
+      {isLoading && <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'><Loader /></div>}
       
       {isSending && (
         <div className='text-center font-title text-lg mt-5 mx-auto gap-4 flex'>
@@ -181,7 +193,7 @@ const ChatPage = () => {
       )}
 
       {/* Send message form */}
-      <form className='flex h-[60px] bg-purple-300 px-3.5 py-2.5 gap-x-5 z-[100]' onSubmit={onSend}>
+      <form className='flex h-[60px] bg-purple-300 px-3.5 py-2.5 gap-x-5' onSubmit={onSend}>
         <div className='aspect-square h-full overflow-hidden bg-hot-300 bg-purple-100'>
           <input className='absolute opacity-0 -z-[1] max-w-full overflow-hidden'  {...register('image')} name='image' id='image' type='file' alt='image' />
 
@@ -198,10 +210,6 @@ const ChatPage = () => {
 
         <button className=' bg-purple-100 text-xl text-white font-title w-[15%]' type='submit'>Send</button>
       </form>
-
-        {/* avatar bar */}
-        <div className='w-[90px] bg-blue-400 absolute top-0 bottom-0 right-0'>
-        </div>
     </div>
   )
 }
