@@ -32,10 +32,11 @@ const ChatPage = () => {
   const [messageLimit, setMessageLimit] = useState<number>(MessageFetchCount.FetchStart);
   const [isSending, setIsSending] = useState(false);
   const messageList = useRef<HTMLDivElement>(null);
-  const lastMessageElement = useRef<HTMLDivElement>(null)
+  const lastMessageElement = useRef<HTMLDivElement>(null);
   const fetchFromPoint = usePrevious(messageLimit);
 
   const {
+    setFocus,
     register,
     handleSubmit,
     reset
@@ -108,12 +109,12 @@ const ChatPage = () => {
 
   const onSend = handleSubmit((data) => {
     let messageType: 'image' | 'text' = data.image.length ? 'image' : 'text';
-
+    
     // if there is no user or id
     if (!id || !user) return;
     // if field is empty
+    console.log(data.message)
     if ((messageType === 'image' && !data.image.length) || (messageType==='text' && !data.message)) return;
-    
     messageApi.createMessage({
       chat: id,
       content: data.image.length ? data.image : data.message,
@@ -173,7 +174,12 @@ const ChatPage = () => {
               </React.Fragment>
             ))
           ) : 
-          !isLoading && <div>no messages yet</div>
+          !isLoading && (
+            <div className='text-3xl font-content text-white text-center mt-[50%] -translate-y-1/2'>
+              <div className='mb-2'>No messages yet</div>
+                <button className='text-xl text-white opacity-70' onClick={() => setFocus('message')}>Click me and start typing...</button>
+            </div>
+          )
         }
         </div>
       </div>
@@ -205,7 +211,14 @@ const ChatPage = () => {
 
         <div className='h-full flex grow items-center '>
           <label htmlFor='message'></label>
-          <input className='bg-purple-100 placeholder:text-white placeholder:opacity-70 px-2.5 py-1.5 w-full h-full text-white' {...register('message')} placeholder='Type message...'  name='message' id='message' type={'text'} />
+          <input
+            className='bg-purple-100 placeholder:text-white placeholder:opacity-70 px-2.5 py-1.5 w-full h-full text-white' 
+            {...register('message')} 
+            placeholder='Type message...'
+            name='message' 
+            id='message' 
+            type={'text'} 
+          />
         </div>
 
         <button className=' bg-purple-100 text-xl text-white font-title w-[15%]' type='submit'>Send</button>
