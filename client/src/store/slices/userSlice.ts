@@ -26,6 +26,9 @@ export const userSlice = createSlice({
         },
         select(state, action: PayloadAction<IUser>) {
             state.selectedUser = action.payload;
+        },
+        resetSelected(state) {
+            state.selectedUser = null;
         }
     }
 });
