@@ -52,13 +52,23 @@ class UserController {
     }
 
     async getUser(key, value) {
-        const doc = await UserModel.findOne({ [key]: value })
-        return new UserDto(doc);
+        const doc = await UserModel.findOne({ [key]: value }).populate('friends')
+
+        const friends = doc.friends.map(friend => (
+            new UserDto(friend)
+        ))
+
+        return {...(new UserDto(doc)), friends};
     }
 
     async getUserById(userId) {
-        const doc = await UserModel.findById(userId)
-        return new UserDto(doc);
+        const doc = await UserModel.findById(userId).populate('friends');
+
+        const friends = doc.friends.map(friend => (
+            new UserDto(friend)
+        ))
+
+        return {...(new UserDto(doc)), friends};
     }
 }
 
