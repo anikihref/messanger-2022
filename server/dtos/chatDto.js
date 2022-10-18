@@ -1,3 +1,5 @@
+import MessageDto from './messageDto.js'
+
 export default class ChatDto {
     constructor(chat) {
         this.id = chat._id; 
@@ -5,7 +7,7 @@ export default class ChatDto {
         this.members = chat.members;
         this.createdAt = chat.createdAt;
         if (chat.lastMessage) {
-            this.lastMessage = chat.lastMessage.content;
+            this.lastMessage = new MessageDto(chat.lastMessage);
         } else {
             this.lastMessage = 'no messages yet'
         }
