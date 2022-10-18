@@ -12,6 +12,10 @@ export const chatApi = {
         return await baseChatUrl.get<IChat>(`/${chatId}`);
     },
 
+    async getLastChats(userId: MongooseIDType, limit?: number): Promise<AxiosResponse<IChat[], any>> {
+        return await baseChatUrl.get<IChat[]>(`/last/${userId}?limit=${limit}`)
+    },
+
     async createChat(chat: Omit<IChat, 'id' | 'createdAt' | 'lastMessage'>): Promise<AxiosResponse<IChat, any>> {
         return await baseChatUrl.post('/', chat);
     },
