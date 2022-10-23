@@ -1,3 +1,4 @@
+import { IUser } from './../../types/user';
 import { fetchChats } from './../actions/fetchChats';
 import { MongooseIDType } from './../../types/index';
 import { IChat } from './../../types/chat';
@@ -25,16 +26,16 @@ export const chatSlice = createSlice({
             state.chats = state.chats.filter(chat => chat.id !== action.payload)
         },
 
-        addUser(state, action: PayloadAction<{chatId: MongooseIDType; userId: MongooseIDType}>) {
+        addUser(state, action: PayloadAction<{chatId: MongooseIDType; user: IUser}>) {
             const chat = state.chats.find(chat => chat.id === action.payload.chatId);
 
-            chat?.members.push(action.payload.userId);
+            chat?.members.push(action.payload.user);
         },
 
-        removeUser(state, action: PayloadAction<{chatId: MongooseIDType; userId: MongooseIDType}>) {
+        removeUser(state, action: PayloadAction<{chatId: MongooseIDType; user: IUser}>) {
             const chat = state.chats.find(chat => chat.id === action.payload.chatId);
             if (!chat) return;
-            chat.members = chat.members.filter(userId => userId !== action.payload.userId)
+            chat.members = chat.members.filter(member => member.id !== action.payload.user.id)
         },
 
         changeTitle(state, action: PayloadAction<{chatId: MongooseIDType; title: string}>) {
