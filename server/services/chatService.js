@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import ChatDto from "../dtos/chatDto.js";
+import UserDto from "../dtos/userDto.js";
 import ChatModel from "../models/ChatModel.js";
 import messageService from './messageService.js'
 
@@ -10,7 +11,7 @@ class ChatService {
 
             const doc = await ChatModel.create({
                 members, lastMessage, title, createdAt
-            }).populate('lastMessage');
+            })
     
             return new ChatDto(doc); 
     }
@@ -19,8 +20,13 @@ class ChatService {
         const docs = await ChatModel.find({members: {$in: mongoose.Types.ObjectId(userId)}})
             .limit(limit)
             .populate('lastMessage')
+            .populate('members')
 
-        return docs.map(chat => new ChatDto(chat));
+
+        return docs.map(chat => ({
+            ...(new ChatDto(chat)),
+            members: chat.members.map(user => new UserDto(user)) 
+        }));
     }
 
     async delete(chatId) {
@@ -28,9 +34,14 @@ class ChatService {
     }
     
     async getChat(chatId) {
-        const doc = await ChatModel.findById(chatId).populate('lastMessage');
-
-        return new ChatDto(doc)
+        const doc = await ChatModel.findById(chatId)
+            .populate('lastMessage')
+            .populate('members');
+        
+        return {
+            ...(new ChatDto(doc)),
+            members: doc.members.map(user => new UserDto(user))
+        }
     }
 
     async changeTitle(title, chatId) {
@@ -74,6 +85,7 @@ class ChatService {
     async getLastChats(userId, limit = 3) {
         let userChats = await ChatModel.find({members: {$in: mongoose.Types.ObjectId(userId)}})
             .populate('lastMessage')
+            .populate('members')
 
         userChats = userChats.sort((chat1, chat2) => {
             console.log(chat1)
@@ -87,7 +99,10 @@ class ChatService {
         }) 
         
 
-        return userChats
+        return userChats.map(chat => ({
+            ...(new ChatDto(chat)),
+            members: chat.members.map(user => new UserDto(user)) 
+        }));
     }
 }
 

@@ -83,23 +83,25 @@ const ProfilePage = () => {
               <div className='grid grid-cols-[1fr_1fr] gap-3'>
                 {user.friends.toString() ? user.friends.map(friend => (
                   <React.Fragment key={friend.id}>
-                    <Link to={`/user/${friend.id}`}>
-                      <div className='bg-blue-200 text-white p-3 flex items-center'>
-                        {/* avatar */}
-                        <div className='aspect-square w-[50px] min-h-[50px] relative mr-3'>
-                          <div className='w-full aspect-square rounded-full bg-gray-300 overflow-hidden '>
-                            <img src='http://localhost:5000/static/empty_avatar.png' alt='avatar' />
+                    <div className='bg-blue-200 text-white flex items-center'>
+                      <Link to={`/user/${friend.id}`}>
+                        <div className='p-3 flex items-center'>
+                          {/* avatar */}
+                          <div className='aspect-square w-[50px] min-h-[50px] relative mr-3'>
+                            <div className='w-full aspect-square rounded-full bg-gray-300 overflow-hidden '>
+                              <img src='http://localhost:5000/static/empty_avatar.png' alt='avatar' />
+                            </div>
+                            <StatusButton status={user.status} />
                           </div>
-                          <StatusButton status={user.status} />
-                        </div>
 
-                        {/* info */}
-                        <div className='flex py-1 flex-col justify-between'>
-                          <h5 className='font-title text-xl'>{friend.username}</h5>
-                          <div>{user.name || 'Name was not provided'}</div>
+                          {/* info */}
+                          <div className='flex py-1 flex-col justify-between'>
+                            <h5 className='font-title text-xl'>{friend.username}</h5>
+                            <div>{user.name || 'Name was not provided'}</div>
+                          </div>
                         </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    </div>
                   </React.Fragment>
                 )) : (
                   <div className='text-center text-white opacity-70 text-2xl'>No friends yet</div>
@@ -139,8 +141,9 @@ const ProfilePage = () => {
                           <h5 className='font-title text-xl text-right'>Members:</h5>
 
                           <ul className='opacity-70  text-right'>
-                            <li>{chat.members[0]}</li>
-                            <li>{chat.members[1]}</li>
+                            {/* chat.members is an array of user IDs or User Objects. We check is the array is an object */}
+                            <li>{chat.members[0].username}</li>
+                            <li>{chat.members[1].username}</li>
                             {chat.members[2] ? (
                               <li>and {chat.members.length - 2} more</li>
                             ) : <li />}

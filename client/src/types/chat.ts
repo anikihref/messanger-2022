@@ -1,3 +1,4 @@
+import { IUser } from './user';
 import { IChatMessage } from './chatMessage';
 import { MongooseIDType } from './index';
 
@@ -7,5 +8,5 @@ export interface IChat {
     lastMessage: IChatMessage | string; // Message
     title: string;
     createdAt: Date;
-    members: MongooseIDType[]; // User
+    members: IUser[]; // User
 }

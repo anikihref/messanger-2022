@@ -14,7 +14,7 @@ const Chat: React.FC<ChatProps> = ({ chat }) => {
   const {user} = useTypedSelector(state => state.user)
 
   useEffect(() => {
-    const otherMemberId = chat.members.find(member => member !== user?.id);
+    const otherMemberId = chat.members.find(member => member.id !== user?.id)?.id;
     if (!otherMemberId) return;
 
     userApi.getUserById(otherMemberId)
