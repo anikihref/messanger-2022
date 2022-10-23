@@ -69,7 +69,9 @@ const ProfilePage = () => {
             {/* buttons */}
             <div className='flex justify-between gap-6'>
               <button className='w-full bg-blue-300 text-white text-xl font-content py-3 px-4'>Edit info</button>
-              <button className='w-full bg-blue-300 text-white text-xl font-content py-3 px-4'>Home</button>
+              <button className='w-full bg-blue-300 text-white text-xl font-content py-3 px-4'>
+                <Link to={'/'}>Home</Link>
+              </button>
             </div>
           </div>
 
@@ -122,12 +124,12 @@ const ProfilePage = () => {
                       {/* Chat element */}
                       <div className='bg-purple-300 text-white p-3 flex items-center'>
                         {/* chat picture */}
-                        <div className='bg-gray-300 rounded-full w-[95px] aspect-square overflow-hidden'>
+                        <div className='bg-gray-300 rounded-full min-w-[95px  ] w-[95px] aspect-square overflow-hidden'>
                           <img src="http://localhost:5000/static/empty_avatar.png" alt="chat" />
                         </div>
 
                         {/* Chat title & message */}
-                        <div className='ml-3 flex flex-col justify-between py-1 max-w-[55%] grow'>
+                        <div className='ml-3 flex flex-col justify-between py-1 max-w-[55%] '>
                           {/* title */}
                           <h4 className='font-title text-2xl mb-2'>{chat.title}</h4>
 
@@ -136,12 +138,11 @@ const ProfilePage = () => {
                         </div>
 
                         {/* members */}
-                        <div className='ml-4'>
+                        <div className='ml-auto pl-3'>
                           {/* title */}
                           <h5 className='font-title text-xl text-right'>Members:</h5>
 
                           <ul className='opacity-70  text-right'>
-                            {/* chat.members is an array of user IDs or User Objects. We check is the array is an object */}
                             <li>{chat.members[0].username}</li>
                             <li>{chat.members[1].username}</li>
                             {chat.members[2] ? (
