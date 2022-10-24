@@ -137,13 +137,20 @@ const UserPage = () => {
 
             {/* Linked socials */}
             <button 
-              className='bg-purple-200 text-white text-xl font-content py-3 px-4 flex justify-center items-center'
+              className='bg-purple-200 text-white text-xl font-content py-3 px-4 flex justify-center items-center relative'
               onClick={() => setMenuDroppedDown(prev => !prev)}
             >
               Linked socials
 
               <div className={`w-8 ml-2 duration-[500ms] ${menuDroppedDown ?  '-rotate-180' : 'rotate-0'}`}>
                 <MdKeyboardArrowDown size={'100%'} />
+              </div>
+
+              {/* dropdown menu */}
+              <div className={`absolute bottom-[-15px] flex flex-col gap-3 w-full duration-500 ${menuDroppedDown ? 'opacity-100 translate-y-full' : 'opacity-0 translate-y-[90%]'}`}>
+                <button className='bg-purple-100 w-full  py-2 px-4'>GitHub</button>
+                <button className='bg-purple-100 w-full  py-2 px-4'>Telegram</button>
+                <button className='bg-purple-100 w-full  py-2 px-4'>Instagram</button>
               </div>
             </button>
 
