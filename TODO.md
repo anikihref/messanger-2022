@@ -14,10 +14,9 @@
 
 #### User page
 
-- [ ] Show user info
-- [ ] Add last 3 chats component
-- [ ] Add friend section 
-    - [ ] Add modal with all friends
+- [x] Show user info
+- [x] Add last chats component
+- [x] Add friend section 
 
 #### Auth pages
 
