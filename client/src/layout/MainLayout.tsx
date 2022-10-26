@@ -49,7 +49,7 @@ const MainLayout = () => {
  
 
   return (
-    <div className='h-full bg-blue-500'>
+    <div className='h-screen bg-blue-500'>
       <div className='container h-full flex'>
         {/* Chatlist */}
         <div className='w-[35%] flex flex-col gap-y-6 p-5 overflow-y-auto bg-blue-400'>

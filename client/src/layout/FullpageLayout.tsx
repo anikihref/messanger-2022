@@ -4,8 +4,8 @@ import NavbarTrigger from '../components/NavbarTrigger';
 
 const FullpageLayout = () => {
   return (
-    <div className='h-full  bg-neutral'>
-      <div className='container max-h-[90%] flex'>
+    <div className='h-full  min-h-screen bg-blue-500'>
+      <div className='container h-full'>
         <Outlet />
       </div>
 

@@ -10,5 +10,5 @@ export interface IUser {
     activated: boolean;
     phoneNumber: string;
     status: 'online' | 'offline';
-    friends: MongooseIDType[]; // User
+    friends: IUser[];
 };

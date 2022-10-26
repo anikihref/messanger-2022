@@ -14,7 +14,7 @@ const Chat: React.FC<ChatProps> = ({ chat }) => {
   const {user} = useTypedSelector(state => state.user)
 
   useEffect(() => {
-    const otherMemberId = chat.members.find(member => member !== user?.id);
+    const otherMemberId = chat.members.find(member => member.id !== user?.id)?.id;
     if (!otherMemberId) return;
 
     userApi.getUserById(otherMemberId)
@@ -43,7 +43,7 @@ const Chat: React.FC<ChatProps> = ({ chat }) => {
         {/* title */}
         <h5 className='font-title text-2xl text-white'>{chat.title}</h5>
         {/* last message */}
-        <div className='font-content text-left text-lg text-white'>{chat.lastMessage}</div>
+        <div className='font-content text-left text-lg text-white'>{typeof chat.lastMessage === 'string' ? chat.lastMessage : chat.lastMessage.content}</div>
       </div>  
     </Link>
   )

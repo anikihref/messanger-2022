@@ -6,8 +6,8 @@ interface StatusButtonProps {
 
 const StatusButton: React.FC<StatusButtonProps> = ({status}) => {
   return (
-    <div>
-        {status}
+    <div className={`${status === 'online' ? 'bg-green-300' : ''} w-[15%] min-w-[10px] rounded-full aspect-square absolute  right-[5%] bottom-[5%]`}>
+
     </div>
   )
 }
