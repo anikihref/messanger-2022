@@ -13,6 +13,8 @@ import { usePrevious } from '../hooks/usePrevious';
 import { socket } from '../layout/MainLayout';
 import { scrollToBottom } from '../helpers/scrollToBottom';
 import SvgSelector from '../components/SvgSelector';
+import TextInput from '../components/TextInput';
+import ImageInput from '../components/ImageInput';
 
 interface MessageInput {
   image: ImageType;
@@ -177,7 +179,7 @@ const ChatPage = () => {
           !isLoading && (
             <div className='text-3xl font-content text-white text-center mt-[50%] -translate-y-1/2'>
               <div className='mb-2'>No messages yet</div>
-                <button className='text-xl text-white opacity-70' onClick={() => setFocus('message')}>Click me and start typing...</button>
+              <button className='text-xl text-white opacity-70' onClick={() => setFocus('message')}>Click me and start typing...</button>
             </div>
           )
         }
@@ -199,28 +201,18 @@ const ChatPage = () => {
       )}
 
       {/* Send message form */}
-      <form className='flex h-[60px] bg-purple-300 px-3.5 py-2.5 gap-x-5' onSubmit={onSend}>
-        <div className='aspect-square h-full overflow-hidden bg-hot-300 bg-purple-100'>
-          <input className='absolute opacity-0 -z-[1] max-w-full overflow-hidden'  {...register('image')} name='image' id='image' type='file' alt='image' />
-
-          {/* custom image picker */}
-          <label htmlFor='image' className='w-full h-full flex items-center justify-center text-cold-100 cursor-pointer p-1.5'>
+      <form className='flex h-[70px] bg-purple-300 px-3.5 py-2.5 gap-x-5' onSubmit={onSend}>
+        <ImageInput
+          name='image'
+          id='image'
+          register={register}
+        >
+          <div className='w-[30px] flex justify-center items-center'>
             <SvgSelector id='image' />
-          </label>
-        </div>
+          </div>
+        </ImageInput>
 
-        <div className='h-full flex grow items-center '>
-          <label htmlFor='message'></label>
-          <input
-            className='bg-purple-100 placeholder:text-white placeholder:opacity-70 px-2.5 py-1.5 w-full h-full text-white' 
-            {...register('message')} 
-            placeholder='Type message...'
-            name='message' 
-            id='message' 
-            type={'text'} 
-          />
-        </div>
-
+        <TextInput register={register} name='message' placeholder='Type message...' id='message' />
         <button className=' bg-purple-100 text-xl text-white font-title w-[15%]' type='submit'>Send</button>
       </form>
     </div>

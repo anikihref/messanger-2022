@@ -136,8 +136,8 @@ const UserPage = () => {
             </div>
 
             {/* Linked socials */}
-            <button 
-              className='bg-purple-200 text-white text-xl font-content py-3 px-4 flex justify-center items-center relative'
+            <div 
+              className='bg-purple-200 text-white text-xl font-content py-3 px-4 flex justify-center cursor-pointer items-center relative'
               onClick={() => setMenuDroppedDown(prev => !prev)}
             >
               Linked socials
@@ -147,12 +147,12 @@ const UserPage = () => {
               </div>
 
               {/* dropdown menu */}
-              <div className={`absolute bottom-[-15px] flex flex-col gap-3 w-full duration-500 ${menuDroppedDown ? 'opacity-100 translate-y-full' : 'opacity-0 translate-y-[90%]'}`}>
+              <div className={`absolute bottom-[-15px] flex flex-col gap-3 w-full duration-500 ${menuDroppedDown ? 'opacity-100 translate-y-full' : 'opacity-0 translate-y-[90%] invisible'}`}>
                 <button className='bg-purple-100 w-full  py-2 px-4'>GitHub</button>
                 <button className='bg-purple-100 w-full  py-2 px-4'>Telegram</button>
                 <button className='bg-purple-100 w-full  py-2 px-4'>Instagram</button>
               </div>
-            </button>
+            </div>
 
             {/* buttons */}
             <div className='flex justify-between gap-6'>

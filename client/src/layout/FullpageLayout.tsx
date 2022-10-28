@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import NavbarTrigger from '../components/NavbarTrigger';
+import {NavbarTrigger} from '../components/navbar/index';
 
 const FullpageLayout = () => {
   return (
