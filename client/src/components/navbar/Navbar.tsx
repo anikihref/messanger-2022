@@ -1,6 +1,6 @@
 import React from 'react';
-import NavbarLink from './NavbarLink';
-import SvgSelector from './SvgSelector';
+import {NavbarLink} from './';
+import SvgSelector from '../SvgSelector';
 
 interface NavbarProps {
   isOpened: boolean;

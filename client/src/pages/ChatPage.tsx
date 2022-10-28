@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { messageApi } from '../api/messageApi';
-import ChatMessage from '../components/ChatMessage';
 import Loader from '../components/Loader';
 import { useTypedDispatch, useTypedSelector } from '../hooks/redux'
 import { fetchMessages } from '../store/actions/fetchMessages';
@@ -13,17 +12,18 @@ import { usePrevious } from '../hooks/usePrevious';
 import { socket } from '../layout/MainLayout';
 import { scrollToBottom } from '../helpers/scrollToBottom';
 import SvgSelector from '../components/SvgSelector';
-import TextInput from '../components/TextInput';
-import ImageInput from '../components/ImageInput';
+import TextInput from '../components/inputs/TextInput';
+import ImageInput from '../components/inputs/ImageInput';
+import { ChatMessageAvatar, ChatMessage } from '../components/chat';
 
 interface MessageInput {
   image: ImageType;
   message: string;
 }
 
-enum MessageFetchCount {
-  FetchStart = 50,
-  FetchLoad = 30
+export enum MessageFetchCount {
+  FetchStart = 2,
+  FetchLoad = 2
 }
 
 const ChatPage = () => {
@@ -147,7 +147,7 @@ const ChatPage = () => {
         {/* load more */}
         {messages.length >= messageLimit && (
           <button 
-            className='mx-auto bg-purple-100 text-white font-title w-1/4 py-2 text-lg mb-4'
+            className='bg-purple-100 text-white font-title w-1/4 py-2 text-lg my-4'
             onClick={() => setMessageLimit(prev => prev + MessageFetchCount.FetchLoad)}
           >
             Load more
@@ -155,24 +155,15 @@ const ChatPage = () => {
         )}
         
         {/* messages */}
-        <div className='grid grid-cols-[1fr_auto] pl-3 pr-2'>
+        <div className='grid grid-cols-[1fr_auto] pl-3'>
           {messages.toString() ? (
             messages.map((message, index) => (
               <React.Fragment key={message.id}>
                 {/* message */}
-                <div 
-                  className={`mr-5 mb-4 ${index === 0 ? 'mt-4' : 'mt-0'}`} 
-                  ref={index === MessageFetchCount.FetchLoad ? lastMessageElement : null}
-                >
-                  <ChatMessage  message={message}/>
-                </div>
+                <ChatMessage message={message} elementRef={lastMessageElement} index={index} />
 
                 {/* avatar */}
-                <div className={`bg-blue-400 w-fit flex items-center px-4 relative pb-4 ${index === 0 ? 'pt-4' : 'pt-0'} ${index === 0 ? 'before:absolute before:bg-blue-400 before:w-full before:h-screen before:right-0 before:top-0' : ''}`}>
-                  <div className='bg-gray-300 rounded-full w-[50px] aspect-square overflow-hidden z-[100]'>
-                    <img src="http://localhost:5000/static/empty_avatar.png" alt="avatar" />
-                  </div>
-                </div>
+                <ChatMessageAvatar index={index} />
               </React.Fragment>
             ))
           ) : 

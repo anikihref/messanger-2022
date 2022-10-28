@@ -8,7 +8,7 @@ interface NavabarLinkProps {
 
 const NavbarLink: React.FC<NavabarLinkProps> = ({to, children}) => {
   return (
-    <NavLink to={to} className={({isActive}) => isActive ? 'duration-500 rounded-full p-2' : 'p-2'}>
+    <NavLink to={to} className={({isActive}) => isActive ? 'duration-500 rounded-full p-2' : 'duration-500 rounded-full p-2'}>
       {children}
     </NavLink>
   )

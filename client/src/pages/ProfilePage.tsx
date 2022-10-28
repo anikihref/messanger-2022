@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import ChatList from '../components/lists/ChatList';
-import FriendList from '../components/lists/FriendList';
+import {FriendList, ChatList} from '../components/lists/';
 import StatusButton from '../components/StatusButton';
 import { useTypedSelector } from '../hooks/redux';
 
