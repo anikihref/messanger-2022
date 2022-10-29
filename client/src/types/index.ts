@@ -4,6 +4,7 @@ export type IDType = string;
 export type ImageType = string;
 export type MongooseIDType = string;
 export type JSONString = string;
+export type TailwindClass = string;
 
 export interface WSMessage {
     type: 'message' | 'connectionMessage' | 'closeMessage' | 'changeRoom';

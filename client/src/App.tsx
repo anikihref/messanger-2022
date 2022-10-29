@@ -11,9 +11,9 @@ import { fetchUser } from './store/actions/fetchUser';
 
 function App() {
   const dispatch = useTypedDispatch();
-
+  
   useEffect(() => {
-    dispatch(fetchUser('grandwar319a@gmail.com'))
+    dispatch(fetchUser(window.confirm() ? 'grandwar319a@gmail.com' : 'grandwar39@gmail.com'))
   }, [])
 
   return (

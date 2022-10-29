@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { messageApi } from '../api/messageApi';
-import ChatMessage from '../components/ChatMessage';
 import Loader from '../components/Loader';
 import { useTypedDispatch, useTypedSelector } from '../hooks/redux'
 import { fetchMessages } from '../store/actions/fetchMessages';
@@ -13,15 +12,19 @@ import { usePrevious } from '../hooks/usePrevious';
 import { socket } from '../layout/MainLayout';
 import { scrollToBottom } from '../helpers/scrollToBottom';
 import SvgSelector from '../components/SvgSelector';
+import TextInput from '../components/inputs/TextInput';
+import ImageInput from '../components/inputs/ImageInput';
+import { ChatMessageAvatar, ChatMessage } from '../components/chat';
+import { Button } from '../components/inputs';
 
 interface MessageInput {
   image: ImageType;
   message: string;
 }
 
-enum MessageFetchCount {
-  FetchStart = 50,
-  FetchLoad = 30
+export enum MessageFetchCount {
+  FetchStart = 2,
+  FetchLoad = 2
 }
 
 const ChatPage = () => {
@@ -94,7 +97,6 @@ const ChatPage = () => {
 
   function handleWebSocketMessage({data}: {data: JSONString}) {
     const {message} = JSON.parse(data)
-      console.log(1)
     dispatch(chatMessageSlice.actions.addMessage(message))
     setTimeout(() => scrollToBottom(messageList.current), 0)
   }
@@ -113,7 +115,6 @@ const ChatPage = () => {
     // if there is no user or id
     if (!id || !user) return;
     // if field is empty
-    console.log(data.message)
     if ((messageType === 'image' && !data.image.length) || (messageType==='text' && !data.message)) return;
     messageApi.createMessage({
       chat: id,
@@ -144,40 +145,33 @@ const ChatPage = () => {
       <div className={`overflow-y-auto scrollbar-thin scrollbar-thumb-purple-100 scrollbar-track-purple-300 grow`} ref={messageList}>
         {/* load more */}
         {messages.length >= messageLimit && (
-          <button 
-            className='mx-auto bg-purple-100 text-white font-title w-1/4 py-2 text-lg mb-4'
+          <Button
+            styles={{
+              margins: 'my-4'
+            }}
             onClick={() => setMessageLimit(prev => prev + MessageFetchCount.FetchLoad)}
           >
             Load more
-          </button>
+          </Button>
         )}
         
         {/* messages */}
-        <div className='grid grid-cols-[1fr_auto] pl-3 pr-2'>
+        <div className='grid grid-cols-[1fr_auto] pl-3'>
           {messages.toString() ? (
             messages.map((message, index) => (
               <React.Fragment key={message.id}>
                 {/* message */}
-                <div 
-                  className={`mr-5 mb-4 ${index === 0 ? 'mt-4' : 'mt-0'}`} 
-                  ref={index === MessageFetchCount.FetchLoad ? lastMessageElement : null}
-                >
-                  <ChatMessage  message={message}/>
-                </div>
+                <ChatMessage message={message} elementRef={lastMessageElement} index={index} />
 
                 {/* avatar */}
-                <div className={`bg-blue-400 w-fit flex items-center px-4 relative pb-4 ${index === 0 ? 'pt-4' : 'pt-0'} ${index === 0 ? 'before:absolute before:bg-blue-400 before:w-full before:h-screen before:right-0 before:top-0' : ''}`}>
-                  <div className='bg-gray-300 rounded-full w-[50px] aspect-square overflow-hidden z-[100]'>
-                    <img src="http://localhost:5000/static/empty_avatar.png" alt="avatar" />
-                  </div>
-                </div>
+                <ChatMessageAvatar index={index} />
               </React.Fragment>
             ))
           ) : 
           !isLoading && (
             <div className='text-3xl font-content text-white text-center mt-[50%] -translate-y-1/2'>
               <div className='mb-2'>No messages yet</div>
-                <button className='text-xl text-white opacity-70' onClick={() => setFocus('message')}>Click me and start typing...</button>
+              <button className='text-xl text-white opacity-70' onClick={() => setFocus('message')}>Click me and start typing...</button>
             </div>
           )
         }
@@ -200,28 +194,18 @@ const ChatPage = () => {
 
       {/* Send message form */}
       <form className='flex h-[60px] bg-purple-300 px-3.5 py-2.5 gap-x-5' onSubmit={onSend}>
-        <div className='aspect-square h-full overflow-hidden bg-hot-300 bg-purple-100'>
-          <input className='absolute opacity-0 -z-[1] max-w-full overflow-hidden'  {...register('image')} name='image' id='image' type='file' alt='image' />
-
-          {/* custom image picker */}
-          <label htmlFor='image' className='w-full h-full flex items-center justify-center text-cold-100 cursor-pointer p-1.5'>
+        <ImageInput
+          name='image'
+          id='image'
+          register={register}
+        >
+          <div className='w-[30px] flex justify-center items-center'>
             <SvgSelector id='image' />
-          </label>
-        </div>
+          </div>
+        </ImageInput>
 
-        <div className='h-full flex grow items-center '>
-          <label htmlFor='message'></label>
-          <input
-            className='bg-purple-100 placeholder:text-white placeholder:opacity-70 px-2.5 py-1.5 w-full h-full text-white' 
-            {...register('message')} 
-            placeholder='Type message...'
-            name='message' 
-            id='message' 
-            type={'text'} 
-          />
-        </div>
-
-        <button className=' bg-purple-100 text-xl text-white font-title w-[15%]' type='submit'>Send</button>
+        <TextInput register={register} name='message' placeholder='Type message...' id='message' />
+        <Button type='submit'>Send</Button>
       </form>
     </div>
   )

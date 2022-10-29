@@ -1,19 +1,27 @@
 import moment from 'moment';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useTypedSelector } from '../hooks/redux';
-import { IChatMessage } from '../types/chatMessage';
+import { useTypedSelector } from '../../hooks/redux';
+import { MessageFetchCount } from '../../pages/ChatPage';
+import { IChatMessage } from '../../types/chatMessage';
 
 interface ChatMessageProps {
   message: IChatMessage;
+  elementRef: React.RefObject<HTMLDivElement>;
+  index: number;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
   message: { chat, content, createdAt, creator, updatedAt, type },
+  elementRef,
+  index
 }) => {
   const user = useTypedSelector((state) => state.user.user);
 
   return (
+    <div 
+      className={`mr-5 mb-4 ${index === 0 ? 'mt-4' : 'mt-0'}`}
+      ref={index === MessageFetchCount.FetchLoad ? elementRef : null}>
       <div
         className={`bg-blue-200 max-w-[65%] w-fit min-w-[50%] p-2.5 relative ${
           creator.id === user?.id ? 'ml-auto' : ''
@@ -38,6 +46,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           {content}
         </div>
       </div>
+    </div>
   );
 };
 
