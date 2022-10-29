@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {FriendList, ChatList} from '../components/lists/';
-import StatusButton from '../components/StatusButton';
+import { UserInfo, UserPresentingInfo } from '../components/user';
 import { useTypedSelector } from '../hooks/redux';
 
 
@@ -14,46 +14,11 @@ const ProfilePage = () => {
         <>
           <div className='grid grid-cols-[1fr_3fr] gap-5'>
             {/* user avatar block */}
-            <div className='bg-purple-100 aspect-square flex flex-col justify-center items-center p-4'>
-              {/* avatar */}
-              <div className='aspect-square w-[135px] relative'>
-                <div className='w-full aspect-square rounded-full bg-gray-300 overflow-hidden'>
-                  <img src='http://localhost:5000/static/empty_avatar.png' alt='avatar' />
-                </div>
-                <StatusButton status={user.status} />
-              </div>
+            <UserPresentingInfo user={user} />
 
-              {/* username */}
-              <div className='text-4xl mt-8 text-white font-title'>
-                {user.username}
-              </div>
-            </div>
               
             {/* info */}
-            <div className='bg-blue-200 p-2 flex flex-col'>
-              {/* name */}
-              <div className='font-content text-4xl text-white mb-4'>
-                {user.name || 'Name was not provided'} 
-              </div>
-
-              {/* bio */}
-              <div className='text-white font-content text-xl grow'>
-                {user.bio || 'Bio was not provided'}
-              </div>
-              
-              {/* email phone */}
-              <div className='opacity-70 text-lg text-white'>
-                {/* email */}
-                <div>
-                  {user.email || 'Email was not provided'}
-                </div>
-
-                {/* phone */}
-                <div>
-                  {user.phoneNumber  || 'Phone was not provided'}
-                </div>
-              </div>
-            </div>
+            <UserInfo user={user} />
 
             {/* Link socials */}
             <button className='bg-purple-200 text-white text-xl font-content py-3 px-4'>Link your socials</button>

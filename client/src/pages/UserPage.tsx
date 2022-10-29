@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { userApi } from '../api/userApi';
-import StatusButton from '../components/StatusButton';
 import { useTypedDispatch, useTypedSelector } from '../hooks/redux';
 import { userSlice } from '../store/slices/userSlice';
 import {MdKeyboardArrowDown} from 'react-icons/md'
 import { chatApi } from '../api/chatApi';
 import { MongooseIDType } from '../types';
+import Loader from '../components/Loader';
+import { UserPresentingInfo, UserInfo } from '../components/user';
 
 const UserPage = () => {
   const { id } = useParams();
@@ -94,46 +95,10 @@ const UserPage = () => {
       {selectedUser ? (
         <div className='grid grid-cols-[1fr_3fr] gap-5'>
             {/* user avatar block */}
-            <div className='bg-purple-100 aspect-square flex flex-col justify-center items-center p-4'>
-              {/* avatar */}
-              <div className='aspect-square w-[135px] relative'>
-                <div className='w-full aspect-square rounded-full bg-gray-300 overflow-hidden'>
-                  <img src='http://localhost:5000/static/empty_avatar.png' alt='avatar' />
-                </div>
-                <StatusButton status={selectedUser.status} />
-              </div>
-
-              {/* username */}
-              <div className='text-4xl mt-8 text-white font-title'>
-                {selectedUser.username}
-              </div>
-            </div>
+            <UserPresentingInfo user={selectedUser} />
               
             {/* info */}
-            <div className='bg-blue-200 p-2 flex flex-col'>
-              {/* name */}
-              <div className='font-content text-4xl text-white mb-4'>
-                {selectedUser.name || 'Name was not provided'} 
-              </div>
-
-              {/* bio */}
-              <div className='text-white font-content text-xl grow'>
-                {selectedUser.bio || 'Bio was not provided'}
-              </div>
-              
-              {/* email phone */}
-              <div className='opacity-70 text-lg text-white'>
-                {/* email */}
-                <div>
-                  {selectedUser.email || 'Email was not provided'}
-                </div>
-
-                {/* phone */}
-                <div>
-                  {selectedUser.phoneNumber  || 'Phone was not provided'}
-                </div>
-              </div>
-            </div>
+            <UserInfo user={selectedUser} />
 
             {/* Linked socials */}
             <div 
@@ -172,7 +137,9 @@ const UserPage = () => {
             </div>
           </div>
       ) : (
-        <div>user not found</div>
+        <div className='fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
+          <Loader />
+        </div>
       )}
     </div>
   );

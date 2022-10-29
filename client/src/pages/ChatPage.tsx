@@ -15,6 +15,7 @@ import SvgSelector from '../components/SvgSelector';
 import TextInput from '../components/inputs/TextInput';
 import ImageInput from '../components/inputs/ImageInput';
 import { ChatMessageAvatar, ChatMessage } from '../components/chat';
+import { Button } from '../components/inputs';
 
 interface MessageInput {
   image: ImageType;
@@ -96,7 +97,6 @@ const ChatPage = () => {
 
   function handleWebSocketMessage({data}: {data: JSONString}) {
     const {message} = JSON.parse(data)
-      console.log(1)
     dispatch(chatMessageSlice.actions.addMessage(message))
     setTimeout(() => scrollToBottom(messageList.current), 0)
   }
@@ -115,7 +115,6 @@ const ChatPage = () => {
     // if there is no user or id
     if (!id || !user) return;
     // if field is empty
-    console.log(data.message)
     if ((messageType === 'image' && !data.image.length) || (messageType==='text' && !data.message)) return;
     messageApi.createMessage({
       chat: id,
@@ -146,12 +145,14 @@ const ChatPage = () => {
       <div className={`overflow-y-auto scrollbar-thin scrollbar-thumb-purple-100 scrollbar-track-purple-300 grow`} ref={messageList}>
         {/* load more */}
         {messages.length >= messageLimit && (
-          <button 
-            className='bg-purple-100 text-white font-title w-1/4 py-2 text-lg my-4'
+          <Button
+            styles={{
+              margins: 'my-4'
+            }}
             onClick={() => setMessageLimit(prev => prev + MessageFetchCount.FetchLoad)}
           >
             Load more
-          </button>
+          </Button>
         )}
         
         {/* messages */}
@@ -192,7 +193,7 @@ const ChatPage = () => {
       )}
 
       {/* Send message form */}
-      <form className='flex h-[70px] bg-purple-300 px-3.5 py-2.5 gap-x-5' onSubmit={onSend}>
+      <form className='flex h-[60px] bg-purple-300 px-3.5 py-2.5 gap-x-5' onSubmit={onSend}>
         <ImageInput
           name='image'
           id='image'
@@ -204,7 +205,7 @@ const ChatPage = () => {
         </ImageInput>
 
         <TextInput register={register} name='message' placeholder='Type message...' id='message' />
-        <button className=' bg-purple-100 text-xl text-white font-title w-[15%]' type='submit'>Send</button>
+        <Button type='submit'>Send</Button>
       </form>
     </div>
   )
