@@ -76,4 +76,4 @@ Auth implemented using **JWT**
 - [x] Last message of chat doesn't show
 - [x] Messages not fetching when changing chat
 - [x] WebSocket sometimes does not return response to another client and sometimes return two of them
-- [ ] If page renders already on chat page than no users get response
+- [x] If page renders already on chat page than no users get response
