@@ -6,16 +6,17 @@ import Loader from '../components/Loader';
 import { useTypedDispatch, useTypedSelector } from '../hooks/redux'
 import { fetchMessages } from '../store/actions/fetchMessages';
 import { chatMessageSlice } from '../store/slices/chatMessageSlice';
-import { ImageType, JSONString, WSMessage } from '../types';
+import { ImageType, JSONString } from '../types';
 import {FiSend} from 'react-icons/fi';
 import { usePrevious } from '../hooks/usePrevious';
-import { socket } from '../layout/MainLayout';
 import { scrollToBottom } from '../helpers/scrollToBottom';
 import SvgSelector from '../components/SvgSelector';
 import TextInput from '../components/inputs/TextInput';
 import ImageInput from '../components/inputs/ImageInput';
 import { ChatMessageAvatar, ChatMessage } from '../components/chat';
 import { Button } from '../components/inputs';
+import messageWS from '../websockets/messageWS';
+import { WSResponse } from '../types/ws';
 
 interface MessageInput {
   image: ImageType;
@@ -23,8 +24,8 @@ interface MessageInput {
 }
 
 export enum MessageFetchCount {
-  FetchStart = 2,
-  FetchLoad = 2
+  FetchStart = 10,
+  FetchLoad = 5
 }
 
 const ChatPage = () => {
@@ -47,12 +48,30 @@ const ChatPage = () => {
 
 
   useEffect(() => {
-    socket?.addEventListener('message', handleWebSocketMessage)
+    if (!user || !id) return;
+
+
+    messageWS.connect({
+      connectionId: user.id,
+      roomId: id,
+      type: 'chat/connection'
+    }, handleWebSocketMessage)
+    if (!user) return;
+
+    window.addEventListener('beforeunload', () => {
+      messageWS.close({
+        connectionId: user.id,
+        type: 'chat/close'
+      })
+    })
 
     return () => {
-      socket?.removeEventListener('message', handleWebSocketMessage)
+      messageWS.close({
+        connectionId: user.id,
+        type: 'chat/close'
+      });
     }
-  }, [])
+  }, [user, id])
 
 
   
@@ -66,13 +85,6 @@ const ChatPage = () => {
     }))
       .then(() => {
         scrollToBottom(messageList.current);
-        handleWebSocketOpen()
-
-        socket?.send(JSON.stringify({
-          connectionId: user.id,
-          roomId: id,
-          type: 'changeRoom'
-        } as WSMessage))
       });
       
 
@@ -96,17 +108,16 @@ const ChatPage = () => {
   }, [messageLimit])
 
   function handleWebSocketMessage({data}: {data: JSONString}) {
-    const {message} = JSON.parse(data)
+    const {data: message, responseState}: WSResponse = JSON.parse(data)
+    console.log(message, responseState)
+
+    if (responseState === 'error') {
+      console.log(message);
+      return;
+    }
+
     dispatch(chatMessageSlice.actions.addMessage(message))
     setTimeout(() => scrollToBottom(messageList.current), 0)
-  }
-
-  function handleWebSocketOpen() {
-    socket?.send(JSON.stringify({
-      type: 'connectionMessage',
-      roomId: id,
-      connectionId: user?.id,
-    } as WSMessage))
   }
 
   const onSend = handleSubmit((data) => {
@@ -116,6 +127,7 @@ const ChatPage = () => {
     if (!id || !user) return;
     // if field is empty
     if ((messageType === 'image' && !data.image.length) || (messageType==='text' && !data.message)) return;
+
     messageApi.createMessage({
       chat: id,
       content: data.image.length ? data.image : data.message,
@@ -127,12 +139,12 @@ const ChatPage = () => {
         dispatch(chatMessageSlice.actions.addMessage(data))
         setTimeout(() => scrollToBottom(messageList.current), 0)
 
-        socket?.send(JSON.stringify({
-          type: 'message',
-          message: data,
+        messageWS.send({
+          type: 'chat/message',
+          content: data,
           connectionId: user.id,
           roomId: id
-        } as WSMessage))
+        });
       })
 
     reset();

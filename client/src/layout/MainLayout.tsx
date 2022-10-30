@@ -4,9 +4,7 @@ import {ChatList} from '../components/lists/';
 import {NavbarTrigger} from '../components//navbar';
 import { useTypedDispatch, useTypedSelector } from '../hooks/redux';
 import { fetchChats } from '../store/actions/fetchChats';
-import { WSMessage } from '../types';
 
-export let socket: WebSocket | null;
 
 const MainLayout = () => {
   const dispatch = useTypedDispatch();
@@ -14,28 +12,8 @@ const MainLayout = () => {
   const [chatsLimit, setChatsLimit] = useState<number>(20);
 
   useEffect(() => {
-    window.addEventListener('beforeunload', () => {
-      socket?.send(JSON.stringify({
-        connectionId: user?.id,
-        type: 'closeMessage'
-      } as WSMessage))
-      
-      socket?.close()
-    })
-  })
-
-  useEffect(() => {
-    socket = new WebSocket('ws://localhost:8000');
-
-    return () => {
-      socket?.send(JSON.stringify({
-        connectionId: user?.id,
-        type: 'closeMessage'
-      } as WSMessage))
-      
-      socket?.close();
-      socket = null
-    }
+   
+    
   }, [])
 
   useEffect(() => {
