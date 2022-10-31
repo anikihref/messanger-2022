@@ -1,6 +1,5 @@
 import React from 'react'
 import { useTypedSelector } from '../../hooks/redux';
-import { chatMessageSlice } from '../../store/slices/chatMessageSlice';
 
 interface ChatMessageAvatarProps {
     index: number;

@@ -11,12 +11,10 @@ import {FiSend} from 'react-icons/fi';
 import { usePrevious } from '../hooks/usePrevious';
 import { scrollToBottom } from '../helpers/scrollToBottom';
 import SvgSelector from '../components/SvgSelector';
-import TextInput from '../components/inputs/TextInput';
-import ImageInput from '../components/inputs/ImageInput';
-import { ChatMessageAvatar, ChatMessage } from '../components/chat';
-import { Button } from '../components/inputs';
-import messageWS from '../websockets/messageWS';
+import {ImageInput, TextInput, Button} from '../components/inputs/index';
+import { ChatMessageAvatar, ChatMessage } from '../components/chat/index';
 import { WSResponse } from '../types/ws';
+import messageWS from '../websockets/messageWS';
 
 interface MessageInput {
   image: ImageType;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import {ChatList} from '../components/lists/';
-import {NavbarTrigger} from '../components//navbar';
+import {NavbarTrigger} from '../components/navbar/index';
 import { useTypedDispatch, useTypedSelector } from '../hooks/redux';
 import { fetchChats } from '../store/actions/fetchChats';
 
