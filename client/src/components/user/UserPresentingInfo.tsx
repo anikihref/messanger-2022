@@ -1,5 +1,6 @@
 import React from 'react'
 import { IUser } from '../../types/user'
+import Avatar from '../Avatar'
 import StatusButton from '../StatusButton'
 
 interface UserPresentingInfoProps {
@@ -11,9 +12,7 @@ const UserPresentingInfo: React.FC<UserPresentingInfoProps> = ({ user }) => {
     <div className='bg-purple-100 aspect-square flex flex-col justify-center items-center p-4'>
     {/* avatar */}
     <div className='aspect-square w-[135px] relative'>
-      <div className='w-full aspect-square rounded-full bg-gray-300 overflow-hidden'>
-        <img src='http://localhost:5000/static/empty_avatar.png' alt='avatar' />
-      </div>
+      <Avatar src='' size='w-full' />
       <StatusButton status={user.status} />
     </div>
 
