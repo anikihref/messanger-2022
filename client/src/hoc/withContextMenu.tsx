@@ -20,6 +20,7 @@ export const withContextMenu =
 
     return (
         <div  
+          className='relative'
           onClick={() => triggerEvent.type === 'click' && setIsVisible(!isVisible)}
           onMouseEnter={() => triggerEvent.type === 'hover' && setIsVisible(true)}
           onMouseLeave={() => triggerEvent.type === 'hover' && setIsVisible(false)}
