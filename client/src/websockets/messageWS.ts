@@ -1,6 +1,7 @@
-import { WSSuccessResponse, WSErrorResponse } from './../types/ws/index';
+import { WSSuccessResponse } from './../types/ws/index';
 import { WebSocketLeaveMessage, WebSocketJoinMessage, EVENT_TYPES, WebSocketSendMessage } from '../types/ws/messageWS';
 import { MongooseIDType } from '../types';
+import { handleAsyncWS } from './helpers/handleAsyncWS';
 
 export interface IMessageWebSocket {
     webSocket: WebSocket | null;
@@ -21,48 +22,7 @@ class MessageWebSocket implements IMessageWebSocket {
         this.connectionId = '';
     }
 
-    handleResponse<T extends WSSuccessResponse>(
-        eventType: EVENT_TYPES,
-    ): Promise<T> {
-        let resolveScoped: (value: T | PromiseLike<T>) => void;
-        let rejectScoped: (reason?: any) => void; 
-
-        function responseHandler (
-            evt: MessageEvent<any>
-        ) {
-            const response: T = JSON.parse(evt.data);
-            if (!resolveScoped || !rejectScoped) return; 
-            
-            if (response.eventType === eventType) {
-                if (response.responseState === 'success') {
-                    resolveScoped(response)
-                } else {
-                    rejectScoped(response)
-                }
-            }
-        }
     
-        const promise: Promise<T> = new Promise((resolve, reject) => {
-            resolveScoped = resolve
-            rejectScoped = reject
-    
-            this.webSocket?.addEventListener('message', responseHandler)
-        })
-    
-        promise
-            .then(() => {
-                console.log(eventType)
-            })
-            .catch((error: WSErrorResponse) => {
-                console.error(`\nMessage WS error in event: ${error.eventType} \nError Message: ${error.message}`)
-            })
-            .finally(() => {
-                this.webSocket?.removeEventListener('message', responseHandler)
-            })
-
-
-        return promise
-    }
 
     connect(url: string = 'ws://localhost:8000', userId: MongooseIDType) {
         this.webSocket = new WebSocket(url);
@@ -101,20 +61,26 @@ class MessageWebSocket implements IMessageWebSocket {
         return promise;
     }
 
-    async joinRoom<T extends WebSocketJoinMessage>(message: T): Promise<WSSuccessResponse> {
+    async joinRoom<T extends WebSocketJoinMessage>(message: T): Promise<WSSuccessResponse | void> {
+        if (!this.webSocket) return;
+
         const JSONMessage: SendType<T> = {
             ...message,
             type: EVENT_TYPES.join,
         }
 
         this.webSocket?.send(JSON.stringify(JSONMessage))
-
         this.webSocket?.addEventListener('message', this.handler)
-        
-        return this.handleResponse<WSSuccessResponse>(EVENT_TYPES.join);
+
+
+        return handleAsyncWS(EVENT_TYPES.join, this.webSocket)
+            .catch((error) => {
+                console.error(`\nMessage WS error in event: ${error.eventType} \nError Message: ${error.message}`)
+            })
     }
 
-    async leaveRoom(message: WebSocketLeaveMessage): Promise<WSSuccessResponse> {
+    async leaveRoom(message: WebSocketLeaveMessage): Promise<WSSuccessResponse | void> {
+        if (!this.webSocket) return;
         const JSONMessage: SendType<WebSocketLeaveMessage> = {
             ...message,
             type: EVENT_TYPES.leave,
@@ -124,11 +90,15 @@ class MessageWebSocket implements IMessageWebSocket {
 
         this.webSocket?.removeEventListener('message', this.handler)
 
-        return this.handleResponse<WSSuccessResponse>(EVENT_TYPES.leave)
+        return handleAsyncWS(EVENT_TYPES.leave, this.webSocket)
+            .catch((error) => {
+                console.error(`\nMessage WS error in event: ${error.eventType} \nError Message: ${error.message}`)
+            })
     }
 
     // returns promise (.then => if message was delivered to the receiver) (.catch => if not)
-    async send<T extends WebSocketSendMessage>(message: T): Promise<WSSuccessResponse> {
+    async send<T extends WebSocketSendMessage>(message: T): Promise<WSSuccessResponse | void> {
+        if (!this.webSocket) return;
         const JSONMessage: SendType<T> = {
             ...message,
             type: EVENT_TYPES.send
@@ -136,7 +106,10 @@ class MessageWebSocket implements IMessageWebSocket {
         
         this.webSocket?.send(JSON.stringify(JSONMessage))
         
-        return this.handleResponse<WSSuccessResponse>(EVENT_TYPES.send);
+        return handleAsyncWS(EVENT_TYPES.send, this.webSocket)
+            .catch((error) => {
+                console.error(`\nMessage WS error in event: ${error.eventType} \nError Message: ${error.message}`)
+            })
     }
 }
 

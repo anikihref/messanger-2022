@@ -16,7 +16,7 @@ import ImageInput from '../components/inputs/ImageInput';
 import { ChatMessageAvatar, ChatMessage } from '../components/chat';
 import { Button } from '../components/inputs';
 import messageWS from '../websockets/messageWS';
-import { WSErrorResponse, WSResponse, WSSuccessResponseWithData } from '../types/ws';
+import { WSResponse, WSSuccessResponseWithData } from '../types/ws';
 import { userSlice } from '../store/slices/userSlice';
 import { EVENT_TYPES } from '../types/ws/messageWS';
 
@@ -86,8 +86,6 @@ const ChatPage = () => {
       })
     }
   }, [user, id])
-
-
   
   useEffect(() => {
     if (!id || !user) return;
