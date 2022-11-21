@@ -11,14 +11,15 @@ import {FiSend} from 'react-icons/fi';
 import { usePrevious } from '../hooks/usePrevious';
 import { scrollToBottom } from '../helpers/scrollToBottom';
 import SvgSelector from '../components/SvgSelector';
-import TextInput from '../components/inputs/TextInput';
-import ImageInput from '../components/inputs/ImageInput';
-import { ChatMessageAvatar, ChatMessage } from '../components/chat';
-import { Button } from '../components/inputs';
+
 import messageWS from '../websockets/messageWS';
 import { WSResponse, WSSuccessResponseWithData } from '../types/ws';
 import { userSlice } from '../store/slices/userSlice';
 import { EVENT_TYPES } from '../types/ws/messageWS';
+import {ImageInput, TextInput, Button} from '../components/inputs/index';
+import { ChatMessage } from '../components/chat/index';
+import { withContextMenu } from '../hoc/withContextMenu';
+import Avatar from '../components/Avatar';
 
 interface MessageInput {
   image: ImageType;
@@ -29,6 +30,8 @@ export enum MessageFetchCount {
   FetchStart = 10,
   FetchLoad = 5
 }
+
+const AvatarWithContextMenu = withContextMenu(Avatar)
 
 const ChatPage = () => {
   const dispatch = useTypedDispatch();
@@ -198,7 +201,21 @@ const ChatPage = () => {
                 <ChatMessage message={message} elementRef={lastMessageElement} index={index} />
 
                 {/* avatar */}
-                <ChatMessageAvatar index={index} />
+                <div 
+                  className={`bg-blue-400 w-fit h-full flex items-center px-4 relative pb-4 
+                  ${index === 0 ? 'pt-3 border-purple-100 border-t-4' : 'pt-0'} 
+                  ${index === messages.length - 1 ? 'border-purple-100 border-b-4 pt-1' : ''}`}
+                >
+                  <AvatarWithContextMenu 
+                    src=''
+                    triggerEvent={{type: 'click'}} 
+                    arrowDirection='right'
+                    customClassName='top-1/2 -translate-y-1/2 -translate-x-full'
+                  >
+                    title
+                  </AvatarWithContextMenu>
+                </div>
+
               </React.Fragment>
             ))
           ) : 

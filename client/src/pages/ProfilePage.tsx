@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {FriendList, ChatList} from '../components/lists/';
-import { UserInfo, UserPresentingInfo } from '../components/user';
+import {FriendList, ChatList} from '../components/lists/index';
+import { UserInfo, UserPresentingInfo } from '../components/user/index';
 import { useTypedSelector } from '../hooks/redux';
 
 

@@ -64,7 +64,7 @@ Auth implemented using **JWT**
 
 ## General
 
-- [ ] Create withTooltip hoc
+- [x] Create withContextMenu hoc
 - [ ] Create modal component
 - [x] Create navbar
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import {NavbarLink} from './';
+import {NavbarLink} from './index';
 import SvgSelector from '../SvgSelector';
 
 interface NavbarProps {

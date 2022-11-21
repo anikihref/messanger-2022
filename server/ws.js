@@ -77,7 +77,10 @@ export function onConnect(ws) {
         } catch (error) {
             ws.send(JSON.stringify({
                 responseState: 'error',
-                data: error
+                data: {
+                    customMessage: 'Message wasn\'t delivered to you. Please reload page.',
+                    ...error
+                }
             }))
         }
     })

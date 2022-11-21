@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom';
 import { TailwindClass } from '../types';
+import Avatar from './Avatar';
 import StatusButton from './StatusButton';
 
 interface ObjectLinkProps {
@@ -23,10 +24,6 @@ interface ObjectLinkProps {
     children?: React.ReactNode;
 }
 
-const TAILWIND_CLASSES = {
-    AVATAR: 'w-full aspect-square rounded-full bg-gray-300 overflow-hidden ',
-    AVATAR_CONTAINER: 'aspect-square min-w-[50px] max-h-[100px] w-[20%] h-full max-w-[100px] relative mr-3'
-}
 
 const ObjectLink: React.FC<ObjectLinkProps> = ({ text, title, avatar, status, path, styles, children }) => {
   return (
@@ -34,10 +31,8 @@ const ObjectLink: React.FC<ObjectLinkProps> = ({ text, title, avatar, status, pa
         <Link to={path}>
             <div className={`${styles?.padding || 'p-3'} flex items-center`}>
                 {/* avatar */}
-                <div className={TAILWIND_CLASSES.AVATAR_CONTAINER}>
-                    <div className={TAILWIND_CLASSES.AVATAR}>
-                        <img src={`${avatar || 'http://localhost:5000/static/empty_avatar.png'}`} alt='avatar' />
-                    </div>
+                <div className={'aspect-square min-w-[50px] max-h-[100px] w-[20%] h-full max-w-[100px] relative mr-3'}>
+                    <Avatar src='' size='w-full' />
                     {status &&  <StatusButton status={status || 'offline'} />}
                 </div>
                 
