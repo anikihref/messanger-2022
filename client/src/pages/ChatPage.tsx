@@ -11,10 +11,13 @@ import {FiSend} from 'react-icons/fi';
 import { usePrevious } from '../hooks/usePrevious';
 import { scrollToBottom } from '../helpers/scrollToBottom';
 import SvgSelector from '../components/SvgSelector';
+
+import messageWS from '../websockets/messageWS';
+import { WSResponse, WSSuccessResponseWithData } from '../types/ws';
+import { userSlice } from '../store/slices/userSlice';
+import { EVENT_TYPES } from '../types/ws/messageWS';
 import {ImageInput, TextInput, Button} from '../components/inputs/index';
 import { ChatMessage } from '../components/chat/index';
-import { WSResponse } from '../types/ws';
-import messageWS from '../websockets/messageWS';
 import { withContextMenu } from '../hoc/withContextMenu';
 import Avatar from '../components/Avatar';
 
@@ -34,9 +37,10 @@ const ChatPage = () => {
   const dispatch = useTypedDispatch();
   const {id} = useParams();
   const {messages, isLoading} = useTypedSelector(state => state.chatMessage);
-  const {user} = useTypedSelector(state => state.user);
+  const {user, chatJoiningEnabled} = useTypedSelector(state => state.user);
   const [messageLimit, setMessageLimit] = useState<number>(MessageFetchCount.FetchStart);
   const [isSending, setIsSending] = useState(false);
+  const [roomConnected, setRoomConnected] = useState(false);
   const messageList = useRef<HTMLDivElement>(null);
   const lastMessageElement = useRef<HTMLDivElement>(null);
   const fetchFromPoint = usePrevious(messageLimit);
@@ -52,30 +56,39 @@ const ChatPage = () => {
   useEffect(() => {
     if (!user || !id) return;
 
+    messageWS.handler = (evt) => handleWebSocketMessage(evt.data)
 
-    messageWS.connect({
-      connectionId: user.id,
-      roomId: id,
-      type: 'chat/connection'
-    }, handleWebSocketMessage)
-    if (!user) return;
+    if (chatJoiningEnabled) {
+      handleJoin()
+    } else {
+      const interval = setInterval(() => {
+        if (chatJoiningEnabled) {
+          handleJoin()
+          clearInterval(interval);
+        }
+      }, 5)
+    }
 
-    window.addEventListener('beforeunload', () => {
-      messageWS.close({
+    function handleJoin() {
+      if (!user || !id) return;
+      
+      messageWS.joinRoom({
         connectionId: user.id,
-        type: 'chat/close'
+        roomId: id,
       })
-    })
+        .then(() => setRoomConnected(true))
+    }
 
     return () => {
-      messageWS.close({
+      dispatch(userSlice.actions.setChatJoiningEnabled(false))
+
+      messageWS.leaveRoom({
         connectionId: user.id,
-        type: 'chat/close'
-      });
+      }).then(() => {
+        dispatch(userSlice.actions.setChatJoiningEnabled(true))
+      })
     }
   }, [user, id])
-
-
   
   useEffect(() => {
     if (!id || !user) return;
@@ -99,6 +112,8 @@ const ChatPage = () => {
     if (!id) return;
     if (messageLimit === MessageFetchCount.FetchStart) return;
 
+    // messageWS.webSocket?.addEventListener('message', () => )
+
     dispatch(fetchMessages({
       chatId: id,
       limit: messageLimit,
@@ -109,17 +124,24 @@ const ChatPage = () => {
       })
   }, [messageLimit])
 
-  function handleWebSocketMessage({data}: {data: JSONString}) {
-    const {data: message, responseState}: WSResponse = JSON.parse(data)
-    console.log(message, responseState)
+  function handleWebSocketMessage(data: JSONString) {
+    const response: WSResponse = JSON.parse(data)
 
-    if (responseState === 'error') {
-      console.log(message);
+    if (response.responseState === 'error') {
+      console.warn(`Error: ${response.message} happened in ${response.eventType}`)
       return;
     }
 
-    dispatch(chatMessageSlice.actions.addMessage(message))
-    setTimeout(() => scrollToBottom(messageList.current), 0)
+    if (response.eventType === EVENT_TYPES.send) {
+      // assume that current response is response with chat message content
+      const dataResponse = response as WSSuccessResponseWithData;
+
+      // if it isn't then stop
+      if (!dataResponse?.data) return;
+
+      dispatch(chatMessageSlice.actions.addMessage(dataResponse.data))
+      setTimeout(() => scrollToBottom(messageList.current), 0)
+    }
   }
 
   const onSend = handleSubmit((data) => {
@@ -137,16 +159,17 @@ const ChatPage = () => {
       type: messageType
     })
       .then(({data}) => {
-        setIsSending(false);
-        dispatch(chatMessageSlice.actions.addMessage(data))
-        setTimeout(() => scrollToBottom(messageList.current), 0)
-
         messageWS.send({
-          type: 'chat/message',
           content: data,
           connectionId: user.id,
-          roomId: id
-        });
+          roomId: id,
+        })
+          .then((asd) => {
+            // console.log(asd)
+            setIsSending(false);
+            dispatch(chatMessageSlice.actions.addMessage(data))
+            setTimeout(() => scrollToBottom(messageList.current), 0)
+          });
       })
 
     reset();
@@ -207,7 +230,7 @@ const ChatPage = () => {
       </div>
       
 
-      {isLoading && <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'><Loader /></div>}
+      {(isLoading && roomConnected) && <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'><Loader /></div>}
       
       {isSending && (
         <div className='text-center font-title text-lg mt-5 mx-auto gap-4 flex'>

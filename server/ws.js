@@ -4,26 +4,69 @@ let connectedUsers = [];
     ws: WebSocket;
     roomId: MongooseIDType
     connectionId?: MongooseIDType;
-    
 }
 */
+
+const EVENT_TYPES = {
+    join: 'chat/join',
+    leave: 'chat/leave',
+    send: 'chat/send',
+}
+
 export function onConnect(ws) {
     ws.on('message', (json) => {
         const data = JSON.parse(json)
         try {
             switch (data.type) {
-                case 'chat/message': {
-                    message(data, ws);
+                case EVENT_TYPES.send: {
+                    try {
+                        message(data, ws);
+                        ws.send(JSON.stringify({
+                            responseState: 'success',
+                            eventType: EVENT_TYPES.send
+                        }))
+                    } catch (error) {
+                        ws.send(JSON.stringify({
+                            eventType: EVENT_TYPES.message,
+                            responseState: 'error',
+                            message: error.message || 'Could send message. Try again.'
+                        }))
+                    }
                     break;
                 }
     
-                case 'chat/connection': {
-                    connectionMessage(data, ws)
+                case EVENT_TYPES.join: {
+                    try {
+                        joinRoom(data, ws)
+                        ws.send(JSON.stringify({
+                            responseState: 'success',
+                            eventType: EVENT_TYPES.join
+                        }))
+                    } catch (error) {
+                        ws.send(JSON.stringify({
+                            eventType: EVENT_TYPES.join,
+                            responseState: 'error',
+                            message: error.message || 'Could not join this chat. Try again.'
+                        }))
+                    }
+                    
                     break;
                 }
-    
-                case 'chat/close': {
-                    closeMessage(data)
+
+                case EVENT_TYPES.leave: {
+                    try {
+                        leaveRoom(data);
+                        ws.send(JSON.stringify({
+                            responseState: 'success',
+                            eventType: EVENT_TYPES.leave
+                        }))
+                    } catch (error) {
+                        ws.send(JSON.stringify({
+                            responseState: 'error',
+                            eventType: EVENT_TYPES.leave,
+                            message: error.message || 'Could not leave this chat. Try again.'
+                        }))
+                    }
                     break;
                 }
     
@@ -44,25 +87,26 @@ export function onConnect(ws) {
 }
 
 
-export function onClose(ws) {
+export function onClose() {
     console.log('closed connection')
 }
 
 function message(data) {
-    const sameRoomUsers = connectedUsers.filter(user => (
+    const multicastUsers = connectedUsers.filter(user => (
         user.roomId === data.roomId && 
         user.connectionId !== data.connectionId
     ))
 
-    sameRoomUsers.forEach(user => {
+    multicastUsers.forEach(user => {
         user.ws.send(JSON.stringify({
             responseState: 'success',
+            eventType: EVENT_TYPES.send,
             data: data.content
         }))
     })
 }
 
-function connectionMessage(data, ws) {
+function joinRoom(data, ws) {
     if (!connectedUsers.some(user => user.connectionId === data.connectionId)) {
         connectedUsers.push({
             ws,
@@ -74,7 +118,7 @@ function connectionMessage(data, ws) {
     }
 }
 
-function closeMessage(data) {
+function leaveRoom(data) {
     if (!connectedUsers.includes(data.connectionId)) {
         connectedUsers = connectedUsers.filter(user => user.connectionId !== data.connectionId)
     } else {

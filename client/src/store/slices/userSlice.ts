@@ -1,18 +1,20 @@
-import { MongooseIDType } from './../../types/index';
+import { WSSuccessResponse } from './../../types/ws/index';
 import { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import { IUser } from './../../types/user';
 
 interface InitialStateProps {
     user: IUser | null;
-    error: string;
+    errors: string[];
     selectedUser: IUser | null;
+    chatJoiningEnabled: boolean 
 }
 
 const initialState: InitialStateProps = {
     user: null,
-    error: '',
-    selectedUser: null
+    errors: [],
+    selectedUser: null,
+    chatJoiningEnabled: true
 };
 
 export const userSlice = createSlice({
@@ -30,8 +32,13 @@ export const userSlice = createSlice({
                 state.user?.friends.push(action.payload)
             }
         },
-        setError(state, action: PayloadAction<string>) {
-            state.error = action.payload;
+
+        setChatJoiningEnabled(state, action: PayloadAction<boolean>) {
+            state.chatJoiningEnabled = action.payload
+        },
+
+        setError(state, action: PayloadAction<string[]>) {
+            state.errors = action.payload;
         },
         auth(state, action: PayloadAction<IUser>) {
             state.user = action.payload;
