@@ -2,7 +2,7 @@ import moment from 'moment';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTypedSelector } from '../../hooks/redux';
-import { MessageFetchCount } from '../../pages/ChatPage';
+import { MessageFetchCount } from '../../pages/chat/ChatPage';
 import { IChatMessage } from '../../types/chatMessage';
 
 interface ChatMessageProps {

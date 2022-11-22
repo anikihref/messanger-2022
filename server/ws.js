@@ -11,6 +11,7 @@ const EVENT_TYPES = {
     join: 'chat/join',
     leave: 'chat/leave',
     send: 'chat/send',
+    delete: 'chat/delete'
 }
 
 export function onConnect(ws) {
@@ -20,7 +21,7 @@ export function onConnect(ws) {
             switch (data.type) {
                 case EVENT_TYPES.send: {
                     try {
-                        message(data, ws);
+                        message(data);
                         ws.send(JSON.stringify({
                             responseState: 'success',
                             eventType: EVENT_TYPES.send
@@ -69,6 +70,14 @@ export function onConnect(ws) {
                     }
                     break;
                 }
+
+                case EVENT_TYPES.delete: {
+                    deleteMessage(data);
+                    ws.send(JSON.stringify({
+                        responseState: 'success',
+                        eventType: EVENT_TYPES.delete
+                    }))
+                }
     
                 default: {
                     throw new Error('Unregistered case')
@@ -89,6 +98,20 @@ export function onConnect(ws) {
 
 export function onClose() {
     console.log('closed connection')
+}
+
+function deleteMessage(data) {
+    const multicastUsers = connectedUsers.filter(user => (
+        user.roomId === data.roomId && 
+        user.connectionId !== data.connectionId
+    ))
+    multicastUsers.forEach(user => {
+        user.ws.send(JSON.stringify({
+            responseState: 'success',
+            eventType: EVENT_TYPES.delete,
+            data: data.content
+        }))
+    })
 }
 
 function message(data) {

@@ -5,6 +5,7 @@ export enum EVENT_TYPES {
     join = 'chat/join',
     leave = 'chat/leave',
     send = 'chat/send',
+    delete = 'chat/delete'
 }
 
 export interface WebSocketJoinMessage {
@@ -14,6 +15,12 @@ export interface WebSocketJoinMessage {
 
 export interface WebSocketLeaveMessage {
     connectionId: MongooseIDType;
+}
+
+export interface WebSocketDeleteMessage {
+    content: MongooseIDType; // chat message id
+    connectionId: MongooseIDType;
+    roomId: MongooseIDType;
 }
 
 export interface WebSocketSendMessage {

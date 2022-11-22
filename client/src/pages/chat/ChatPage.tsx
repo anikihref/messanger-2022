@@ -1,25 +1,25 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
-import { messageApi } from '../api/messageApi';
-import Loader from '../components/Loader';
-import { useTypedDispatch, useTypedSelector } from '../hooks/redux'
-import { fetchMessages } from '../store/actions/fetchMessages';
-import { chatMessageSlice } from '../store/slices/chatMessageSlice';
-import { ImageType, JSONString } from '../types';
+import { messageApi } from '../../api/messageApi';
+import Loader from '../../components/Loader';
+import { useTypedDispatch, useTypedSelector } from '../../hooks/redux'
+import { fetchMessages } from '../../store/actions/fetchMessages';
+import { chatMessageSlice } from '../../store/slices/chatMessageSlice';
+import { ImageType, JSONString, MongooseIDType } from '../../types';
 import {FiSend} from 'react-icons/fi';
-import { usePrevious } from '../hooks/usePrevious';
-import { scrollToBottom } from '../helpers/scrollToBottom';
-import SvgSelector from '../components/SvgSelector';
-
-import messageWS from '../websockets/messageWS';
-import { WSResponse, WSSuccessResponseWithData } from '../types/ws';
-import { userSlice } from '../store/slices/userSlice';
-import { EVENT_TYPES } from '../types/ws/messageWS';
-import {ImageInput, TextInput, Button} from '../components/inputs/index';
-import { ChatMessage } from '../components/chat/index';
-import { withContextMenu } from '../hoc/withContextMenu';
-import Avatar from '../components/Avatar';
+import { usePrevious } from '../../hooks/usePrevious';
+import { scrollToBottom } from '../../helpers/scrollToBottom';
+import SvgSelector from '../../components/SvgSelector';
+import messageWS from '../../websockets/messageWS';
+import { WSResponse, WSSuccessResponseWithData } from '../../types/ws';
+import { userSlice } from '../../store/slices/userSlice';
+import { EVENT_TYPES } from '../../types/ws/messageWS';
+import {ImageInput, TextInput, Button} from '../../components/inputs/index';
+import { ChatMessage } from '../../components/chat/index';
+import { withContextMenu } from '../../hoc/withContextMenu';
+import Avatar from '../../components/Avatar';
+import { IChatMessage } from '../../types/chatMessage';
 
 interface MessageInput {
   image: ImageType;
@@ -56,7 +56,7 @@ const ChatPage = () => {
   useEffect(() => {
     if (!user || !id) return;
 
-    messageWS.handler = (evt) => handleWebSocketMessage(evt.data)
+    messageWS.handler = (evt) => handleReceiveMessage(evt.data)
 
     if (chatJoiningEnabled) {
       handleJoin()
@@ -68,6 +68,15 @@ const ChatPage = () => {
         }
       }, 5)
     }
+
+    dispatch(fetchMessages({
+      chatId: id,
+      limit: messageLimit,
+      from: fetchFromPoint! >= messageLimit ? 0 : fetchFromPoint
+    }))
+      .then(() => {
+        scrollToBottom(messageList.current);
+      });
 
     function handleJoin() {
       if (!user || !id) return;
@@ -81,6 +90,7 @@ const ChatPage = () => {
 
     return () => {
       dispatch(userSlice.actions.setChatJoiningEnabled(false))
+      dispatch(chatMessageSlice.actions.reset())
 
       messageWS.leaveRoom({
         connectionId: user.id,
@@ -89,30 +99,10 @@ const ChatPage = () => {
       })
     }
   }, [user, id])
-  
-  useEffect(() => {
-    if (!id || !user) return;
-
-    dispatch(fetchMessages({
-      chatId: id,
-      limit: messageLimit,
-      from: fetchFromPoint! >= messageLimit ? 0 : fetchFromPoint
-    }))
-      .then(() => {
-        scrollToBottom(messageList.current);
-      });
-      
-
-    return () => {  
-      dispatch(chatMessageSlice.actions.reset())
-    }
-  }, [id, user])
 
   useEffect(() => {
     if (!id) return;
     if (messageLimit === MessageFetchCount.FetchStart) return;
-
-    // messageWS.webSocket?.addEventListener('message', () => )
 
     dispatch(fetchMessages({
       chatId: id,
@@ -124,22 +114,44 @@ const ChatPage = () => {
       })
   }, [messageLimit])
 
-  function handleWebSocketMessage(data: JSONString) {
-    const response: WSResponse = JSON.parse(data)
+  function handleDeleteMessage(messageId: MongooseIDType) {
+    if (!user || !id) return;
 
+    messageApi.deleteMessage(messageId)
+      .then(() => {
+        messageWS.deleteMessage({
+          connectionId: user.id,
+          content: messageId,
+          roomId: id
+        })
+      })
+
+    dispatch(chatMessageSlice.actions.delete(messageId))
+  }
+
+  function handleReceiveMessage(data: JSONString) {
+    const response: WSResponse = JSON.parse(data)
+    
     if (response.responseState === 'error') {
       console.warn(`Error: ${response.message} happened in ${response.eventType}`)
       return;
     }
+    
+    if (response.eventType === EVENT_TYPES.delete) {
+      // assume that current response is response with chat message content
+      const responseDataContent = (response as WSSuccessResponseWithData<string>).data;
+      // if it isn't then stop
+      if (!responseDataContent) return;
+
+      dispatch(chatMessageSlice.actions.delete(responseDataContent))
+    }
 
     if (response.eventType === EVENT_TYPES.send) {
-      // assume that current response is response with chat message content
-      const dataResponse = response as WSSuccessResponseWithData;
+      const responseDataContent = (response as WSSuccessResponseWithData<IChatMessage>).data;
 
-      // if it isn't then stop
-      if (!dataResponse?.data) return;
+      if (!responseDataContent) return;
 
-      dispatch(chatMessageSlice.actions.addMessage(dataResponse.data))
+      dispatch(chatMessageSlice.actions.addMessage(responseDataContent))
       setTimeout(() => scrollToBottom(messageList.current), 0)
     }
   }
@@ -164,8 +176,7 @@ const ChatPage = () => {
           connectionId: user.id,
           roomId: id,
         })
-          .then((asd) => {
-            // console.log(asd)
+          .then(() => {
             setIsSending(false);
             dispatch(chatMessageSlice.actions.addMessage(data))
             setTimeout(() => scrollToBottom(messageList.current), 0)
@@ -212,7 +223,13 @@ const ChatPage = () => {
                     arrowDirection='right'
                     customClassName='top-1/2 -translate-y-1/2 -translate-x-full'
                   >
-                    title
+                    {
+                      message.creator.id === user?.id && (
+                        <Button onClick={() => handleDeleteMessage(message.id)}>
+                          Delete message
+                        </Button>
+                      )
+                    }
                   </AvatarWithContextMenu>
                 </div>
 
@@ -230,7 +247,7 @@ const ChatPage = () => {
       </div>
       
 
-      {(isLoading && roomConnected) && <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'><Loader /></div>}
+      {(isLoading || !roomConnected) && <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'><Loader /></div>}
       
       {isSending && (
         <div className='text-center font-title text-lg mt-5 mx-auto gap-4 flex'>

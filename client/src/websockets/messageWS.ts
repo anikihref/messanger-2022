@@ -1,5 +1,5 @@
 import { WSSuccessResponse } from './../types/ws/index';
-import { WebSocketLeaveMessage, WebSocketJoinMessage, EVENT_TYPES, WebSocketSendMessage } from '../types/ws/messageWS';
+import { WebSocketLeaveMessage, WebSocketJoinMessage, EVENT_TYPES, WebSocketSendMessage, WebSocketDeleteMessage } from '../types/ws/messageWS';
 import { MongooseIDType } from '../types';
 import { handleAsyncWS } from './helpers/handleAsyncWS';
 
@@ -9,7 +9,7 @@ export interface IMessageWebSocket {
     connectionId?: MongooseIDType;
 }
 
-type SendType<T> = T & {type: EVENT_TYPES.join | EVENT_TYPES.leave | EVENT_TYPES.send} 
+type SendType<T> = T & {type: EVENT_TYPES} 
 
 class MessageWebSocket implements IMessageWebSocket {
     webSocket: WebSocket | null;
@@ -91,6 +91,21 @@ class MessageWebSocket implements IMessageWebSocket {
         this.webSocket?.removeEventListener('message', this.handler)
 
         return handleAsyncWS(EVENT_TYPES.leave, this.webSocket)
+            .catch((error) => {
+                console.error(`\nMessage WS error in event: ${error.eventType} \nError Message: ${error.message}`)
+            })
+    }
+
+    async deleteMessage<T extends WebSocketDeleteMessage>(message: T): Promise<WSSuccessResponse | void> {
+        if (!this.webSocket) return;
+        const JSONMessage: SendType<T> = {
+            ...message,
+            type: EVENT_TYPES.delete
+        }
+        
+        this.webSocket?.send(JSON.stringify(JSONMessage))
+        
+        return handleAsyncWS(EVENT_TYPES.delete, this.webSocket)
             .catch((error) => {
                 console.error(`\nMessage WS error in event: ${error.eventType} \nError Message: ${error.message}`)
             })

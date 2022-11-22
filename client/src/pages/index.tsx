@@ -1,4 +1,4 @@
-export {default as ChatPage} from './ChatPage';
+export {default as ChatPage} from './chat/ChatPage';
 export {default as ProfilePage} from './ProfilePage';
 export {default as UserPage} from './UserPage';
 export {default as SettingsPage} from './SettingsPage';
