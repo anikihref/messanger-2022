@@ -8,14 +8,13 @@ interface WithContextMenuProps {
     cb?: (...arg: any) => any;
   };
   arrowDirection?: 'top' | 'bottom' | 'left' | 'right';
-  customClassName?: string;
 }
 
 export const withContextMenu =
   <P extends object>(
     Component: React.ComponentType<P>
   ): React.FC<P & WithContextMenuProps> =>
-  ({ triggerEvent, children, customClassName, arrowDirection, ...props }) => {
+  ({ triggerEvent, children, arrowDirection, ...props }) => {
     const [isVisible, setIsVisible] = useState(false);
 
     return (
