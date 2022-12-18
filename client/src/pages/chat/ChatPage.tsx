@@ -129,12 +129,14 @@ const ChatPage = () => {
     reader.readAsDataURL(file);
     reader.onload = () => resolve(reader.result);
     reader.onerror = error => reject(error);
-});
+  });
 
   const onSend = async (data: MessageData) => {
     if (!id || !user) return;
 
     const {image, message} = data;
+
+    if (!image.length && !message) return;
 
     const messageType = message ? 'text' : 'image';
     let content: string = message;

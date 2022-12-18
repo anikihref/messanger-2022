@@ -16,7 +16,6 @@ interface FormProps {
 
 const Form: React.FC<FormProps> = ({onSubmit, withImage}) => {
     const {
-
         register,
         handleSubmit,
         reset
