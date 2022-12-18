@@ -6,6 +6,7 @@ interface ButtonProps {
         bg?: TailwindClass;
         margins?: TailwindClass;
         paddings?: TailwindClass;
+        custom?: TailwindClass;
     };
     type?: 'submit' | 'button' | 'reset';
     children?: React.ReactNode;
@@ -21,7 +22,7 @@ const Button: React.FC<ButtonProps> = ({ children, styles, type, onClick }) => {
             ${styles?.bg || 'bg-purple-100'} 
             ${styles?.margins || ''} 
             ${styles?.paddings || 'py-2 px-5'}
-            text-white font-title text-lg `
+            text-white font-title text-lg ${styles?.custom}`
         }
     >
         {children}
