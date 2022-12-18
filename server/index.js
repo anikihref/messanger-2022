@@ -7,6 +7,7 @@ import { userRouter } from './routers/user.js';
 import { messageRouter } from './routers/message.js';
 import { chatRouter } from './routers/chat.js';
 import { onClose, onConnect } from './ws.js';
+import bodyParser from 'body-parser';
 
 const app = express();
 export const wsServer = new WebSocketServer({ port: 8000 });
@@ -20,6 +21,8 @@ config();
 
 // middlewares
 app.use(cors());
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(express.json());
 app.use('/static', express.static('static'));
 

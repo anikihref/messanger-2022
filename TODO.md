@@ -38,8 +38,8 @@
 
 - [x] Message sending
 - [x] Message smart fetching (returning from server only non-fetched messages and push them to message list)
-- [ ] Pictures sending (handle data flowing to server and create fileService on server)
-- [ ] Select chat when user chooses it
+- [x] Pictures sending 
+- [x] Select chat when user chooses it
 
 #### Additional 
 

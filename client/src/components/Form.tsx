@@ -5,7 +5,7 @@ import { Button, ImageInput, TextInput } from './inputs'
 import SvgSelector from './SvgSelector';
 
 export interface MessageData {
-    image: ImageType;
+    image: FileList;
     message: string;
 }
   

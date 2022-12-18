@@ -21,9 +21,8 @@ const AvatarWithContextMenu = withContextMenu(Avatar)
 
 const ChatMessageList: React.FC<ChatMessageListProps> = ({ messages, lastElementRef, chatId }) => {
     const {user} = useTypedSelector(state => state.user);
-    const {messages: chatMessages} = useTypedSelector(state => state.chatMessage);
     const dispatch = useTypedDispatch()
-    console.log(chatMessages)
+
     function handleDeleteMessage(messageId: MongooseIDType) {
         if (!user) return;
         messageApi.deleteMessage(messageId)
@@ -41,7 +40,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({ messages, lastElement
 
     return (
         <div className='grid grid-cols-[1fr_auto] pl-3'>
-            {chatMessages.map((message, index) => (
+            {messages.map((message, index) => (
                 <React.Fragment key={message.id}>
                     {/* message */}
                     <ChatMessage message={message} elementRef={lastElementRef} index={index} />

@@ -1,29 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import { chatApi } from '../../api/chatApi';
 import { useTypedSelector } from '../../hooks/redux';
-import { MongooseIDType, TailwindClass } from '../../types';
+import { MongooseIDType } from '../../types';
 import { IChat } from '../../types/chat';
 import ObjectLink from '../ObjectLink'
 
 interface ChatListProps {
-    itemStyle?: {
-        titleFontSize?: TailwindClass
-        textFontSize?: TailwindClass
-        bg?: TailwindClass
-        padding?: TailwindClass
-    };
     limit?: number;
-    showMembers?: boolean;
-    chatsFromUserId?: MongooseIDType;
+    userId?: MongooseIDType;
 }
 
-const ChatList: React.FC<ChatListProps> = ({itemStyle, limit, chatsFromUserId, showMembers}) => {
+const ChatList: React.FC<ChatListProps> = ({limit, userId}) => {
     const {user} = useTypedSelector(state => state.user)
     const [chats, setChats] = useState<IChat[]>([]);
 
+
     useEffect(() => {
         if (!user) return
-          chatApi.getAllChats(chatsFromUserId || user.id, limit || 3)
+          chatApi.getAllChats(userId || user.id, limit || 3)
             .then(({data}) => setChats(data))
     }, [user])
 
@@ -33,29 +27,17 @@ const ChatList: React.FC<ChatListProps> = ({itemStyle, limit, chatsFromUserId, s
                 <React.Fragment key={chat.id}>
                     <ObjectLink 
                         path={'/chat/' + chat.id} 
-                        title={{value: chat.title, fontSize: itemStyle?.titleFontSize || ''}} 
-                        text={{
-                            value: typeof chat.lastMessage === 'string' ? chat.lastMessage : chat.lastMessage.content,
-                            fontSize: itemStyle?.textFontSize || ''
-                        }}
-                        styles={{
-                            bg: itemStyle?.bg || '',
-                            padding: itemStyle?.padding || ''
-                        }}
+                        title={chat.title} 
                     >
-                        {showMembers && (
-                            <div className='ml-auto pl-3'>
-                                <h5 className='font-title text-xl text-right'>Members:</h5>
-                                
-                                <ul className='opacity-70  text-right'>
-                                    <li>{chat.members[0].username}</li>
-                                    <li>{chat.members[1].username}</li>
-                                    {chat.members[2] && (
-                                        <li>and {chat.members.length - 2} more</li>
-                                    )}
-                                </ul>
-                            </div>
-                        )}                    
+                        {typeof chat.lastMessage === 'string' ?(
+                            chat.lastMessage
+                        ) : (
+                            chat.lastMessage.type === 'image' ? (
+                                <img src={chat.lastMessage.content} className='max-h-[50px]' alt='message' />
+                            ) : (
+                                chat.lastMessage.content
+                            )
+                        )}             
                     </ObjectLink>
                 </React.Fragment>
                 

@@ -43,7 +43,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 
         {/* content */}
         <div className='text-white font-content text-sm min-h-[50px] mt-2'>
-          {content}
+          {type === 'image' ? (
+            <img src={content} alt="message" />
+          ) : (<p>{content}</p>)}
         </div>
       </div>
     </div>

@@ -50,9 +50,7 @@ const ProfilePage = () => {
 
               {/* list */}
               <div className='grid gap-3'>
-                <ChatList limit={3} showMembers={true} itemStyle={{
-                  bg: 'bg-purple-300'
-                }}/>
+                <ChatList limit={3}/>
               </div>
             </div>
           </div>

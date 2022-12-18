@@ -124,17 +124,31 @@ const ChatPage = () => {
     }
   }
 
-  const onSend = (data: MessageData ) => {
-    let messageType: 'image' | 'text' = data.image.length ? 'image' : 'text';
-    
-    // if there is no user or id
+  const toBase64 = (file: File) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+});
+
+  const onSend = async (data: MessageData) => {
     if (!id || !user) return;
-    // if field is empty
-    if ((messageType === 'image' && !data.image.length) || (messageType==='text' && !data.message)) return;
+
+    const {image, message} = data;
+
+    const messageType = message ? 'text' : 'image';
+    let content: string = message;
+
+    if (image.length > 0) {
+      const contentImage = image[0];
+      const result = await toBase64(contentImage)
+
+      if (typeof result === 'string') content = result;
+    }
 
     messageApi.createMessage({
       chat: id,
-      content: data.image.length ? data.image : data.message,
+      content,
       creator: user.id,
       type: messageType
     })
